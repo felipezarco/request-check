@@ -1,0 +1,41 @@
+{
+  "name": "request-check",
+  "version": "0.0.1",
+  "description": "Checks if request body is valid",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "request",
+    "validation",
+    "validations",
+    "validator",
+    "validity",
+    "payload",
+    "body",
+    "functions",
+    "check",
+    "express",
+    "content"
+  ],
+  "author": "Luiz Felipe Zarco <felipezarco@hotmail.com> (https://gitlab.com/felipezarco)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/felipezarco/request-check.git"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.6",
+    "express": "^4.17.1",
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.9.2"
+  }, 
+  "devDependencies": {
+    "@types/jest": "^26.0.0",
+    "jest": "^26.0.1",
+    "ts-jest": "^26.1.0"
+  }
+}
