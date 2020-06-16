@@ -2,8 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class RequestCheck {
     constructor() {
-        this.setRequiredMessage = (message) => this.requiredMessage = message;
+        this.setRequiredMessage = (message) => {
+            this.requiredMessage = message;
+        };
         this.addRule = (field, fn, message) => {
+            message = message.replace(':name', name).replace(':field', name);
             field in this.rules ? this.rules[field].push({ fn, message }) :
                 this.rules[field] = [{ fn, message }];
         };
@@ -15,6 +18,7 @@ class RequestCheck {
                 if (!value && value !== false)
                     invalid.push({
                         name, message: this.requiredMessage
+                            .replace(':name', name).replace(':field', name).replace(':value', value)
                     });
                 else if (name in this.rules) {
                     let array = [...this.rules[name]];

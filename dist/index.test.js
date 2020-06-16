@@ -4,15 +4,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = __importDefault(require("./index"));
-test('validates', () => {
+test('it validates as expected', () => {
+    index_1.default.requiredMessage = 'The field :name is required!';
+    index_1.default.addRule('age', (age) => age > 18, 'You need to be at least 18 years old!');
     const request = {
-        name: 'Felipe',
-        color: 'blue',
-        age: 10
+        name: 'Zarco',
+        age: 8,
+        color: undefined
     };
-    const { name, color, age } = request;
-    index_1.default.addRule('age', (age) => age > 18, 'You need to have at least 18 years old!');
+    const { name, age, color } = request;
     const invalid = index_1.default.check({ name }, { color }, { age });
-    if (invalid)
-        console.log(invalid);
+    expect(invalid).toEqual([
+        {
+            name: 'color',
+            message: 'The field color is required!'
+        },
+        {
+            name: 'age',
+            message: 'You need to be at least 18 years old!'
+        }
+    ]);
 });

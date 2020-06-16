@@ -2,7 +2,7 @@ declare class RequestCheck {
     rules: any;
     requiredMessage: string;
     constructor();
-    setRequiredMessage: (message: string) => string;
+    setRequiredMessage: (message: string) => void;
     addRule: (field: string, fn: any, message: string) => void;
     check: (...args: Array<any>) => Array<{
         name: string;
