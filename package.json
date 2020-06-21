@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [
     "request",
@@ -27,11 +28,9 @@
     "type": "git",
     "url": "git://github.com/felipezarco/request-check.git"
   },
-  "dependencies": {
-    "tsc": "^1.20150623.0",
-    "typescript": "^3.9.2"
-  },
   "devDependencies": {
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.9.2",
     "@types/jest": "^26.0.0",
     "jest": "^26.0.1",
     "ts-jest": "^26.1.0"

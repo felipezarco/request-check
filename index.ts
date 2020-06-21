@@ -1,3 +1,4 @@
+const isFunction = (variable: any) => variable && {}.toString.call(variable) === '[object Function]'
 
 class RequestCheck {
 
@@ -13,10 +14,16 @@ class RequestCheck {
     this.requiredMessage = message
   }
 
-  addRule = (field: string, fn: any, message: string) => {
-    message = message.replace(':name', name).replace(':field', name)
-    field in this.rules ? this.rules[field].push({ fn, message }) : 
-    this.rules[field] = [{ fn, message }]
+  addRule = (field: string, ...rules: { fn: any, message: string }[]) => {
+    while(rules.length) {
+      let rule = rules.shift()
+      if(rule) {
+        let { fn, message } = rule
+        rule.message.replace(':name', name).replace(':field', name)
+        field in this.rules ? this.rules[field].push({ fn, message }) : 
+        this.rules[field] = [{ fn, message }]
+      }
+    }
   }
 
   check = (...args: Array<any>): Array<{ name: string, message: string }> | undefined => {
