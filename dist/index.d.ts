@@ -3,9 +3,12 @@ declare class RequestCheck {
     requiredMessage: string;
     constructor();
     setRequiredMessage: (message: string) => void;
-    addRule: (field: string, fn: any, message: string) => void;
+    addRule: (field: string, ...rules: {
+        validator: any;
+        message: string;
+    }[]) => void;
     check: (...args: Array<any>) => Array<{
-        name: string;
+        field: string;
         message: string;
     }> | undefined;
 }

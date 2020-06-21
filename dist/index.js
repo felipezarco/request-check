@@ -1,32 +1,39 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const isFunction = (variable) => variable && {}.toString.call(variable) === '[object Function]';
 class RequestCheck {
     constructor() {
         this.setRequiredMessage = (message) => {
             this.requiredMessage = message;
         };
-        this.addRule = (field, fn, message) => {
-            message = message.replace(':name', name).replace(':field', name);
-            field in this.rules ? this.rules[field].push({ fn, message }) :
-                this.rules[field] = [{ fn, message }];
+        this.addRule = (field, ...rules) => {
+            while (rules.length) {
+                let rule = rules.shift();
+                if (rule) {
+                    let { validator, message } = rule;
+                    rule.message.replace(':name', name).replace(':field', name);
+                    field in this.rules ? this.rules[field].push({ validator, message }) :
+                        this.rules[field] = [{ validator, message }];
+                }
+            }
         };
         this.check = (...args) => {
             let invalid = [];
             while (args.length) {
                 let object = args.shift();
-                let name = Object.keys(object)[0], value = object[name];
+                let field = Object.keys(object)[0], value = object[field];
                 if (!value && value !== false)
                     invalid.push({
-                        name, message: this.requiredMessage
-                            .replace(':name', name).replace(':field', name).replace(':value', value)
+                        field, message: this.requiredMessage
+                            .replace(':name', field).replace(':field', field).replace(':value', value)
                     });
-                else if (name in this.rules) {
-                    let array = [...this.rules[name]];
+                else if (field in this.rules) {
+                    let array = [...this.rules[field]];
                     while (array.length) {
                         let validation = array.shift();
-                        if (!validation.fn(value)) {
+                        if (!validation.validator(value)) {
                             invalid.push({
-                                name, message: validation.message
+                                field, message: validation.message
                             });
                             break;
                         }
@@ -35,7 +42,7 @@ class RequestCheck {
             }
             return invalid.length ? invalid : undefined;
         };
-        this.requiredMessage = 'Este campo é de preenchimento obrigatório!';
+        this.requiredMessage = 'This field is required!';
         this.rules = {};
     }
 }

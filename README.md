@@ -21,7 +21,7 @@ Add `request-check` with your favorite package manager:
 
   import rc from 'request-check'
 
-import { Request, Response } from 'express'
+  import { Request, Response } from 'express'
 
   class UserController {
 
@@ -48,7 +48,7 @@ This line checks whether those two variables are set.
   const invalid = rc.check({email}, {name})
 ```
 
-Check will return an `Array` of objects with `field` and `message` **or** `undefined` 
+Check will return an `Array` of objects with `field` and `message` **or** it will return `undefined` 
 
 In the above example, if none of the variables are given, invalid will contain:
 
@@ -63,17 +63,38 @@ If both fields are given, invalid will be **undefined**.
 
 ### Validations
 
-In addition to check if the variable is set, `check` will look for a rule definition for that variable.
+In addition to check if the variable is set, `check` will also look for a rule definition for that variable.
 
-You can add a rule like this:
+This is how you can add a rule:
 
 ```typescript
-rc.addRule('age', {
-  validator: (email: any) => age > 18, 
-  message: 'You need to be at least 18 years old!'
+rc.addRule('email', {
+  validator: (email: any) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
+  message: 'The email given is not valid!'
 })
 ```
 
+Suppose this variables values:
+
+```javascript
+const email = 'felipezarco@hotmail'
+const name = undefined
+```
+
+Now, when you call
+
+```javascript
+  const invalid = rc.check({email}, {name})
+```
+
+The output stored in `invalid` will contain:
+
+```javascript
+[
+  { field: 'name', message: 'The field name is required!' },
+  { field: 'email', message: 'The email given is not valid!' }
+]
+```
 
 ### Configuration
 
