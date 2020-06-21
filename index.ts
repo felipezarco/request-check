@@ -6,7 +6,7 @@ class RequestCheck {
   requiredMessage: string
 
   constructor() {
-    this.requiredMessage = 'Este campo é de preenchimento obrigatório!'
+    this.requiredMessage = 'This field is required!'
     this.rules = {}
   }
 
@@ -14,34 +14,34 @@ class RequestCheck {
     this.requiredMessage = message
   }
 
-  addRule = (field: string, ...rules: { fn: any, message: string }[]) => {
+  addRule = (field: string, ...rules: { validator: any, message: string }[]) => {
     while(rules.length) {
       let rule = rules.shift()
       if(rule) {
-        let { fn, message } = rule
+        let { validator, message } = rule
         rule.message.replace(':name', name).replace(':field', name)
-        field in this.rules ? this.rules[field].push({ fn, message }) : 
-        this.rules[field] = [{ fn, message }]
+        field in this.rules ? this.rules[field].push({ validator, message }) : 
+        this.rules[field] = [{ validator, message }]
       }
     }
   }
 
-  check = (...args: Array<any>): Array<{ name: string, message: string }> | undefined => {
-    let invalid: Array<{name: string, message: string}> = []
+  check = (...args: Array<any>): Array<{ field: string, message: string }> | undefined => {
+    let invalid: Array<{field: string, message: string}> = []
     while(args.length) {
       let object = args.shift()
-      let name = Object.keys(object)[0], value = object[name]
+      let field = Object.keys(object)[0], value = object[field]
       if(!value && value !== false) invalid.push({ 
-        name, message: this.requiredMessage
-        .replace(':name', name).replace(':field', name).replace(':value', value)
+        field, message: this.requiredMessage
+        .replace(':name', field).replace(':field', field).replace(':value', value)
       })
-      else if(name in this.rules) {
-        let array = [ ...this.rules[name]]
+      else if(field in this.rules) {
+        let array = [ ...this.rules[field]]
         while(array.length) {
           let validation = array.shift()
-          if(!validation.fn(value)) {
+          if(!validation.validator(value)) {
             invalid.push({
-              name, message: validation.message
+              field, message: validation.message
             })
             break
           }
