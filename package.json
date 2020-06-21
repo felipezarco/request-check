@@ -1,6 +1,6 @@
 {
   "name": "request-check",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "Checks if request body is valid",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,10 +29,10 @@
     "url": "git://github.com/felipezarco/request-check.git"
   },
   "devDependencies": {
-    "tsc": "^1.20150623.0",
-    "typescript": "^3.9.2",
     "@types/jest": "^26.0.0",
     "jest": "^26.0.1",
-    "ts-jest": "^26.1.0"
+    "ts-jest": "^26.1.0",
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.9.2"
   }
 }
