@@ -59,8 +59,6 @@ test('it validates with more than one function', () => {
 
   const invalid = rc.check({name}, {age}, {color})
 
-  console.log(invalid)
-
   expect(invalid).toEqual([
     { field: 'age', message: 'The age must be under 23!' },
     { field: 'color', message: 'Color must be blue!' }
@@ -94,8 +92,6 @@ test('it validates with separated rules from same variable', () => {
   const { name, color, age } = request
 
   const invalid = rc.check({name}, {age}, {color})
-
-  console.log(invalid)
 
   expect(invalid).toEqual([
     { field: 'age', message: 'The age must be under 23!' },
