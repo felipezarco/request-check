@@ -49,7 +49,7 @@ This line checks whether those two variables are set.
   const invalid = validator.check({email}, {name})
 ```
 
-Check will return an `Array` of objects with `field` and `message` **or** it will return `undefined`
+Check will return an `Array` of objects with `field` and `message` **or** it will return `undefined`.
 
 In the above example, if none of the variables are given, invalid will contain:
 
@@ -60,7 +60,7 @@ In the above example, if none of the variables are given, invalid will contain:
 ]
 ```
 
-If both fields are given, invalid will be **undefined**.
+If both fields are given, `check` will return **undefined** and `invalid` would avaliate to `false`.
 
 ### Validations
 
@@ -75,14 +75,14 @@ validator.addRule('email', {
 })
 ```
 
-Suppose this variables values:
+Suppose the variable values:
 
 ```javascript
 const email = 'felipezarco@hotmail.com'
 const name = undefined
 ```
-e
-Now, when you call
+
+Now, when you call:
 
 ```javascript
   const invalid = validator.check({email}, {name})
