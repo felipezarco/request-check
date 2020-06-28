@@ -1,6 +1,6 @@
 {
   "name": "@zarcobox/validator",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Checks if request body is valid",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,9 +24,12 @@
   ],
   "author": "Luiz Felipe Zarco <felipezarco@hotmail.com> (https://gitlab.com/felipezarco)",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/felipezarco/validator.git"
+    "url": "git://github.com/zarcobox/validator.git"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
@@ -37,7 +40,7 @@
     "typescript": "^3.9.2"
   },
   "bugs": {
-    "url": "https://github.com/felipezarco/validator/issues"
+    "url": "https://github.com/felipezarco/:/issues"
   },
   "homepage": "https://github.com/felipezarco/validator#readme" 
 }

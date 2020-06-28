@@ -4,7 +4,7 @@
 
 You should not always believe the data is exactly what you think it is. Hopefully, you will validate data you received, for example when it comes to one of your controllers. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Therefore, I built my own. It is rather simple and it works.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/%40zarcobox%2Fvalidator.svg)](https://badge.fury.io/js/%40zarcobox%2Fvalidator) [![Build Status](https://travis-ci.org/zarcobox/validator.svg?branch=master)](https://travis-ci.org/zarcobox/validator) [![Coverage Status](https://coveralls.io/repos/github/zarcobox/validator/badge.svg?branch=master)](https://coveralls.io/github/zarcobox/validator?branch=master)  ![Downloads](https://img.shields.io/npm/dw/validator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/%40zarcobox%2Fvalidator.svg)](https://badge.fury.io/js/%40zarcobox%2Fvalidator) [![Build Status](https://travis-ci.org/zarcobox/validator.svg?branch=master)](https://travis-ci.org/zarcobox/validator) [![Coverage Status](https://coveralls.io/repos/github/zarcobox/validator/badge.svg?branch=master)](https://coveralls.io/github/zarcobox/validator?branch=master)  ![Downloads](https://img.shields.io/npm/dw/@zarcobox/validator)
 
 [![npm](https://nodei.co/npm/@zarcobox/validator.png)](https://www.npmjs.com/package/@zarcobox/validator)
 
