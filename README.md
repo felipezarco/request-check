@@ -12,11 +12,12 @@ You should not always believe the data is exactly what you think it is. Hopefull
 
 Add `validator` with your favorite package manager:
 
-```
-  yarn add @zarcobox/validator
+```bash
+yarn add @zarcobox/validator
 ```
 
 ## Usage
+
 ```typescript
 
 import validator from '@zarcobox/validator'
@@ -39,6 +40,7 @@ class UserController {
 }
 
 ```
+
 ### Basic Check
 
 This line checks whether those two variables are set.
@@ -79,7 +81,7 @@ Suppose this variables values:
 const email = 'felipezarco@hotmail.com'
 const name = undefined
 ```
-
+e
 Now, when you call
 
 ```javascript
@@ -104,7 +106,6 @@ validator.requiredMessage = 'The field :name was not given =(!'
 ```
 
 The symbol `:name` will be replaced with the field name. (Its use is optional)
-
 
 ## Testing
 
