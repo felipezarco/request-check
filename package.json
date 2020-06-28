@@ -1,6 +1,6 @@
 {
   "name": "@zarcobox/validator",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Checks if request body is valid",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
