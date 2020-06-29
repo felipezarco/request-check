@@ -1,6 +1,6 @@
 {
   "name": "request-check",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Checks if request body is valid",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
