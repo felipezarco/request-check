@@ -1,5 +1,3 @@
-const isFunction = (variable: any) => variable && {}.toString.call(variable) === '[object Function]'
-
 class RequestCheck {
 
   rules: any
