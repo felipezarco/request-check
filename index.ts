@@ -19,7 +19,6 @@ class RequestCheck {
       let rule = rules.shift()
       if(rule) {
         let { validator, message } = rule
-        rule.message.replace(':name', name).replace(':field', name)
         field in this.rules ? this.rules[field].push({ validator, message }) : 
         this.rules[field] = [{ validator, message }]
       }
