@@ -27,6 +27,7 @@ class RequestCheck {
     let invalid: Array<{field: string, message: string}> = []
     while(args.length) {
       let object = args.shift()
+      if(!object) continue
       let field = Object.keys(object)[0], value = object[field]
       if(!value && value !== false) invalid.push({ 
         field, message: this.requiredMessage
