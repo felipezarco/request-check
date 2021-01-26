@@ -1,0 +1,14 @@
+coverage
+coveralls.yml
+.travis.yml
+index.test.ts
+jest.config.js
+node_modules
+source
+tsconfig.json
+yarn-error.log
+yarn.lock
+package-lock.json
+tsconfig.json
+.github
+.vscode

@@ -1,3 +1,8 @@
+interface IRule {
+  validator: Function
+  message: string
+}
+
 class RequestCheck {
 
   rules: any
@@ -12,7 +17,18 @@ class RequestCheck {
     this.requiredMessage = message
   }
 
-  addRule = (field: string, ...rules: { validator: any, message: string }[]) => {
+  addRule = (field: string, ...rules: IRule[]) => {
+    while(rules.length) {
+      let rule = rules.shift()
+      if(rule) {
+        let { validator, message } = rule
+        field in this.rules ? this.rules[field].push({ validator, message }) : 
+        this.rules[field] = [{ validator, message }]
+      }
+    }
+  }
+  
+  addRules = (field: string, rules: IRule[]) => {
     while(rules.length) {
       let rule = rules.shift()
       if(rule) {
@@ -41,7 +57,6 @@ class RequestCheck {
             invalid.push({
               field, message: validation.message
             })
-            break
           }
         }
       }
@@ -50,4 +65,6 @@ class RequestCheck {
   }
 }
 
-export default new RequestCheck()
+const requestCheck = () => new RequestCheck()
+
+export default requestCheck
