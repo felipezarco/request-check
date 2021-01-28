@@ -1,9 +1,9 @@
 {
-  "name": "@zarcobox/validator",
-  "version": "0.2.10",
-  "description": "Checks if request body is valid",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "name": "request-check",
+  "version": "1.2.0",
+  "description": "Checks if request body is given and valid",
+  "main": "index.js",
+  "types": "index",
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -22,14 +22,14 @@
     "express",
     "content"
   ],
-  "author": "Luiz Felipe Zarco <felipezarco@hotmail.com> (https://gitlab.com/felipezarco)",
+  "author": "Luiz Felipe Zarco <felipezarco@hotmail.com> (https://github.com/felipezarco)",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/zarcobox/validator.git"
+    "url": "git://github.com/felipezarco/request-check.git"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
@@ -40,7 +40,7 @@
     "typescript": "^3.9.2"
   },
   "bugs": {
-    "url": "https://github.com/zarcobox/issues"
+    "url": "https://github.com/felipezarco/request-check/issues"
   },
-  "homepage": "https://github.com/zarcobox/validator#readme"
+  "homepage": "https://github.com/felipezarco/request-check#readme"
 }

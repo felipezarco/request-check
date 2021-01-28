@@ -8,6 +8,12 @@ interface IFieldsAndRules {
   rules: IRule[]
 }
 
+interface ICheckable {
+  field: string
+  message: string
+}
+
+
 class RequestCheck {
 
   rules: any
@@ -42,18 +48,13 @@ class RequestCheck {
     }
   }
   
-  removeRules = (field: string) => this.rules[field] = []
-  
-  empty = () => this.rules = []
-
-  check = (...args: Array<any>): Array<{ field: string, message: string }> | undefined => {
-    let invalid: Array<{field: string, message: string}> = []
+  check = (...args: Array<any>): Array<ICheckable> | undefined => {
+    let invalid: Array<ICheckable> = []
     while(args.length) {
       let object = args.shift()
       if(!object) continue
-      console.log(object)
       let field = Object.keys(object)[0], value = object[field]
-      if(!value && value !== false) invalid.push({ 
+      if(!value && value !== false && value !== 0) invalid.push({ 
         field, message: this.requiredMessage
         .replace(':name', field).replace(':field', field).replace(':value', value)
       })

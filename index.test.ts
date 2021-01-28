@@ -213,8 +213,6 @@ test('it can add multiple fields with rules with a single method', () => {
     {age}
   )
   
-  console.log(invalid)
-
   expect(invalid).toEqual([
     { 
       field: 'name', 
