@@ -1,6 +1,6 @@
 {
   "name": "request-check",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Checks if request body is given and valid",
   "main": "index.js",
   "types": "index",
