@@ -12,13 +12,13 @@ test('it validates as expected', () => {
     message: 'You need to be at least 18 years old!'
   })
 
-  const request = {
+  const requestBody = {
     name: 'Zarco',
     age: 8,
     color: undefined
   }
 
-  const { name, age, color } = request
+  const { name, age, color } = requestBody
 
   const invalid = rc.check({name}, {color}, {age})
 
@@ -53,13 +53,13 @@ test('it validates with more than one function', () => {
 
   rc.addRule('color', { validator: (color: any) => color === 'blue', message: 'Color must be blue!'})
 
-  const request = {
+  const requestBody = {
     name: 'Zarco',
     age: '23',
     color: 'yellow'
   }
 
-  const { name, color, age } = request
+  const { name, color, age } = requestBody
 
   const invalid = rc.check({name}, {age}, {color})
 
@@ -89,13 +89,13 @@ test('it validates with separated rules from same variable', () => {
   
   rc.addRule('color', { validator: (color: any) => color === 'blue', message: 'Color must be blue!'})
 
-  const request = {
+  const requestBody = {
     name: 'Zarco',
     age: '23',
     color: 'yellow'
   }
 
-  const { name, color, age } = request
+  const { name, color, age } = requestBody
 
   const invalid = rc.check({name}, {age}, {color})
 
@@ -117,13 +117,13 @@ test('it add multiple rules by various arguments', () => {
     { validator: (color: any) => color.charAt(0).toLowerCase() === 'b', message: 'Color must start with letter B!'}, 
   )
 
-  const request = {
+  const requestBody = {
     name: 'Zarco',
     age: '23',
     color: 'yellow'
   }
 
-  const { name, color, age } = request
+  const { name, color, age } = requestBody
 
   const invalid = rc.check({name}, {age}, {color})
 
@@ -167,4 +167,68 @@ test('it add multiple rules by method which receives an array of rules', () => {
     { field: 'age', message: 'The age must be a number!' },
   ])
 
+})
+
+test('it can add multiple fields with rules with a single method', () => {
+  
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+
+  rc.addFieldsAndRules([
+    {
+      field: 'color', 
+      rules: [{ 
+        validator: (color: any) => color === 'blue', 
+        message: 'Color must be blue!' 
+      }]
+    },
+    {
+      field: 'age', 
+      rules: [{
+        validator: (age: number) => age > 18, 
+        message: 'You need to be at least 18 years old!'
+      },
+      { 
+        validator: (age: number) => age < 23, 
+        message: 'The age must be under 23!' 
+      },
+      {
+        validator: (age: number) => !isNaN(age),
+        message: 'The age must be a number!'
+      }]
+    }
+  ])
+  
+  const requestBody: any = {
+    age: 10,
+    color: undefined
+  }
+
+  const { name, age, color } = requestBody
+
+  const invalid = rc.check(
+    {name},
+    {color}, 
+    {age}
+  )
+  
+  console.log(invalid)
+
+  expect(invalid).toEqual([
+    { 
+      field: 'name', 
+      message: 'The field name is required!' 
+    },
+    { 
+      field: 'color', 
+       message: 'The field color is required!' 
+     },
+    { 
+      field: 'age', 
+      message: 'You need to be at least 18 years old!' 
+    }
+  ])
+
+  
 })

@@ -3,6 +3,11 @@ interface IRule {
   message: string
 }
 
+interface IFieldsAndRules {
+  field: string
+  rules: IRule[]
+}
+
 class RequestCheck {
 
   rules: any
@@ -18,32 +23,35 @@ class RequestCheck {
   }
 
   addRule = (field: string, ...rules: IRule[]) => {
-    while(rules.length) {
-      let rule = rules.shift()
-      if(rule) {
-        let { validator, message } = rule
-        field in this.rules ? this.rules[field].push({ validator, message }) : 
-        this.rules[field] = [{ validator, message }]
-      }
+    this.addRules(field, rules)
+  }
+
+  addRules = (field: string, rules: IRule[]) => {
+    let rule = undefined
+    while(rule = rules.shift()) {
+      let { validator, message } = rule
+      field in this.rules ? this.rules[field].push({ validator, message }) : 
+      this.rules[field] = [{ validator, message }]
     }
   }
   
-  addRules = (field: string, rules: IRule[]) => {
-    while(rules.length) {
-      let rule = rules.shift()
-      if(rule) {
-        let { validator, message } = rule
-        field in this.rules ? this.rules[field].push({ validator, message }) : 
-        this.rules[field] = [{ validator, message }]
-      }
+  addFieldsAndRules = (fieldsAndRules: IFieldsAndRules[]) => {
+    let fieldAndRule = undefined
+    while(fieldAndRule = fieldsAndRules.shift()) {
+      this.addRules(fieldAndRule.field, fieldAndRule.rules)
     }
   }
+  
+  removeRules = (field: string) => this.rules[field] = []
+  
+  empty = () => this.rules = []
 
   check = (...args: Array<any>): Array<{ field: string, message: string }> | undefined => {
     let invalid: Array<{field: string, message: string}> = []
     while(args.length) {
       let object = args.shift()
       if(!object) continue
+      console.log(object)
       let field = Object.keys(object)[0], value = object[field]
       if(!value && value !== false) invalid.push({ 
         field, message: this.requiredMessage
