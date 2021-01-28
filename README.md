@@ -6,7 +6,7 @@ You should not always believe the data is exactly what you think it is. Hopefull
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/request-check.svg)](https://badge.fury.io/js/request-check) [![Build Status](https://travis-ci.org/felipezarco/request-check.svg?branch=master)](https://travis-ci.org/felipezarco/request-check) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/request-check/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/request-check?branch=master)  ![Downloads](https://img.shields.io/npm/dw/request-check)
 
-[![npm](https://nodei.co/npm/felipezarco/request-check.png)](https://www.npmjs.com/package/request-check)
+[![npm](https://nodei.co/npm/request-check.png)](https://www.npmjs.com/package/request-check)
 
 ## Install
 
