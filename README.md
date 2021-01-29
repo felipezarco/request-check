@@ -153,30 +153,43 @@ Optionally, you may pass an array of rules as the second argument:
 
 ### Usage Recommendation
 
-`````javascript
-import requestCheck from 'request-check'
-import responser from 'responser
+```javascript
 
 import { Request, Response } from 'express'
+import requestCheck from 'request-check'
+import responser from 'responser'
 
 class UserController {
 
   async create(request: Request, response: Response) {
 
-  const { email, name } = request.body
-  
-  const rc = requestCheck()
-  
-  const invalid = rc.check({email}, {name})
-
-  if(invalid) {
-    response.send_badRequest('Invalid fields!', invalid)
-  }
+    const { email, name } = request.body
     
-  // ...
+    const rc = requestCheck()
+    
+    const invalid = rc.check({email}, {name})
+
+    if(invalid) {
+      response.send_badRequest('Invalid fields!', invalid)
+    }
+    
+    // ...
+  
+  }
 
 }
-````
+
+```
+
+Responser is a simple way to send responses in express. Check it out at: https://www.npmjs.com/package/responser
+
+### Request Check Instance
+
+The `requestCheck()` method will create a new stored `rc` with its own rules.
+
+You can export `rc` or the rules array to another file using module export for better organization.
+
+Remember that while using the same instance, `rc` will check all rules added to it previously. 
 
 ### Configuration
 
