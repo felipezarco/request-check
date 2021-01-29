@@ -230,3 +230,62 @@ test('it can add multiple fields with rules with a single method', () => {
 
   
 })
+
+
+
+test('it can check only if is given', () => {
+  
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+
+  rc.addFieldsAndRules([
+    {
+      field: 'color', 
+      rules: [{ 
+        validator: (color: any) => color === 'blue', 
+        message: 'Color must be blue!' 
+      }]
+    },
+    {
+      field: 'age', 
+      rules: [{
+        validator: (age: number) => age > 18, 
+        message: 'You need to be at least 18 years old!'
+      },
+      { 
+        validator: (age: number) => age < 23, 
+        message: 'The age must be under 23!' 
+      },
+      {
+        validator: (age: number) => !isNaN(age),
+        message: 'The age must be a number!'
+      }]
+    }
+  ])
+  
+  const requestBody: any = {
+    color: undefined
+  }
+
+  const { name, age, color } = requestBody
+
+  const invalid = rc.check(
+    {name},
+    {color}, 
+    age ? {age} : {} 
+  )
+  
+  expect(invalid).toEqual([
+    { 
+      field: 'name', 
+      message: 'The field name is required!' 
+    },
+    { 
+      field: 'color', 
+       message: 'The field color is required!' 
+     }
+  ])
+
+  
+})

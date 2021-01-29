@@ -8,11 +8,14 @@ interface IFieldsAndRules {
   rules: IRule[]
 }
 
-interface ICheckable {
+interface ICheck {
   field: string
   message: string
 }
 
+const isEmptyObject = (object: any) => Object.keys(object).length === 0 && object.constructor === Object
+
+const isObject = (object: any) => typeof object === 'object' && object !== null
 
 class RequestCheck {
 
@@ -48,11 +51,11 @@ class RequestCheck {
     }
   }
   
-  check = (...args: Array<any>): Array<ICheckable> | undefined => {
-    let invalid: Array<ICheckable> = []
+  check = (...args: Array<any>): Array<ICheck> | undefined => {
+    let invalid: Array<ICheck> = []
     while(args.length) {
       let object = args.shift()
-      if(!object) continue
+      if(!object || !isObject(object) || isEmptyObject(object)) continue
       let field = Object.keys(object)[0], value = object[field]
       if(!value && value !== false && value !== 0) invalid.push({ 
         field, message: this.requiredMessage

@@ -6,7 +6,7 @@ You should not always believe the data is exactly what you think it is. Hopefull
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/request-check.svg)](https://badge.fury.io/js/request-check) [![Build Status](https://travis-ci.org/felipezarco/request-check.svg?branch=master)](https://travis-ci.org/felipezarco/request-check) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/request-check/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/request-check?branch=master)  ![Downloads](https://img.shields.io/npm/dw/request-check)
 
-[![npm](https://nodei.co/npm/felipezarco/request-check.png)](https://www.npmjs.com/package/request-check)
+[![npm](https://nodei.co/npm/request-check.png)](https://www.npmjs.com/package/request-check)
 
 ## Install
 
@@ -20,7 +20,7 @@ yarn add request-check
 
 ```typescript
 
-import rc from 'request-check'
+import requestCheck from 'request-check'
 
 import { Request, Response } from 'express'
 
@@ -29,14 +29,22 @@ class UserController {
   async create(request: Request, response: Response) {
 
   const { email, name } = request.body
+  
+  const rc = requestCheck()
+  
+  /* invalid will only avaliate to true if variables pass the check */
 
   const invalid = rc.check({email}, {name})
 
-  if(invalid) response.status(400).json({ invalid })
-
-      // ...
-
+  if(invalid) {
+  
+    // Case some invalid
+ 
+    response.status(400).json({ invalid })
   }
+  
+  // Case no invalid...
+  
 }
 
 ```
@@ -51,7 +59,7 @@ This line checks whether those two variables are set.
 
 Check will return an `Array` of objects with `field` and `message` **or** it will return `undefined`.
 
-In the above example, if none of the variables are given, invalid will contain:
+In the above example, if variables `email` and `name` were not set, invalid will contain:
 
 ```javascript
 [
@@ -60,7 +68,7 @@ In the above example, if none of the variables are given, invalid will contain:
 ]
 ```
 
-If both fields are given, `check` will return **undefined** and `invalid` would avaliate to `false`.
+If both variables were set, `check` would return **undefined** and `invalid` would avaliate to `false`.
 
 ### Validations
 
@@ -96,6 +104,79 @@ The output stored in `invalid` will contain:
   { field: 'email', message: 'The email given is not valid!' }
 ]
 ```
+
+### Conditional validation
+
+You can use this if you want to validate only if variable is set:
+
+```javascript
+  const invalid = rc.check(
+    {name},
+    {color}, 
+    age ? {age} : undefined
+  ) 
+```
+
+In the example above, if age is not given check will not send the required field message. Therefore making `age` an optional field and `name` and `color` required fields. 
+
+Using empty object `{}` instead of `undefined` will work as well.
+  
+### Adding multiple rules
+
+You can add more rules by passing additional arguments to `addRule`:
+
+```javascript
+  rc.addRule('age', { 
+    validator: (age: number) => age > 18, 
+    message:'You need to be at least 18 years old!' 
+  },
+   {
+    validator: (age: any) => age < 23,
+    message: 'The age must be under 23!'
+  })
+```
+
+Optionally, you may pass an array of rules as the second argument:
+
+```javascript
+  rc.addRules('age', [
+    { 
+      validator: (age: number) => age < 23, 
+      message: 'The age must be under 23!' 
+    },
+    {
+      validator: (age: any) => !isNaN(age),
+      message: 'The age must be a number!'
+    }
+  ])
+```
+
+### Usage Recommendation
+
+`````javascript
+import requestCheck from 'request-check'
+import responser from 'responser
+
+import { Request, Response } from 'express'
+
+class UserController {
+
+  async create(request: Request, response: Response) {
+
+  const { email, name } = request.body
+  
+  const rc = requestCheck()
+  
+  const invalid = rc.check({email}, {name})
+
+  if(invalid) {
+    response.send_badRequest('Invalid fields!', invalid)
+  }
+    
+  // ...
+
+}
+````
 
 ### Configuration
 
