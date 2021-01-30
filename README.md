@@ -154,7 +154,6 @@ Optionally, you may pass an array of rules as the second argument:
 ### Usage Recommendation
 
 ```javascript
-
 import { Request, Response } from 'express'
 import requestCheck from 'request-check'
 import responser from 'responser'
@@ -178,7 +177,6 @@ class UserController {
   }
 
 }
-
 ```
 
 Responser is a simple way to send responses in express. Check it out at: https://www.npmjs.com/package/responser
