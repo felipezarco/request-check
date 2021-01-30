@@ -10,4 +10,15 @@ interface ICheck {
     field: string;
     message: string;
 }
-declare const isEmptyObject: (object: any) => boolean;
+declare class RequestCheck {
+    rules: any;
+    requiredMessage: string;
+    constructor();
+    setRequiredMessage: (message: string) => void;
+    addRule: (field: string, ...rules: IRule[]) => void;
+    addRules: (field: string, rules: IRule[]) => void;
+    addFieldsAndRules: (fieldsAndRules: IFieldsAndRules[]) => void;
+    check: (...args: Array<any>) => Array<ICheck> | undefined;
+}
+declare const requestCheck: () => RequestCheck;
+export default requestCheck;
