@@ -36,8 +36,8 @@ class RequestCheck {
   }
 
   addRules = (field: string, rules: IRule[]) => {
-    let rule = undefined
-    while(rule = rules.shift()) {
+    let rule: IRule | undefined = undefined
+    while(rule = rules.shift() as IRule | undefined) {
       let { validator, message } = rule
       field in this.rules ? this.rules[field].push({ validator, message }) : 
       this.rules[field] = [{ validator, message }]
@@ -46,7 +46,7 @@ class RequestCheck {
   
   addFieldsAndRules = (fieldsAndRules: IFieldsAndRules[]) => {
     let fieldAndRule = undefined
-    while(fieldAndRule = fieldsAndRules.shift()) {
+    while(fieldAndRule = fieldsAndRules.shift() as IFieldsAndRules | undefined) {
       this.addRules(fieldAndRule.field, fieldAndRule.rules)
     }
   }
