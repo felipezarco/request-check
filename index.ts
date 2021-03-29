@@ -45,7 +45,7 @@ class RequestCheck {
   }
   
   addFieldsAndRules = (fieldsAndRules: IFieldsAndRules[]) => {
-    let fieldAndRule = undefined
+    let fieldAndRule: IFieldsAndRules | undefined = undefined
     while(fieldAndRule = fieldsAndRules.shift() as IFieldsAndRules | undefined) {
       this.addRules(fieldAndRule.field, fieldAndRule.rules)
     }
