@@ -13,6 +13,10 @@ interface ICheck {
   message: string
 }
 
+interface ICheckObj {
+  [key: string]: string
+}
+
 const isEmptyObject = (object: any) => Object.keys(object).length === 0 && object.constructor === Object
 
 const isObject = (object: any) => typeof object === 'object' && object !== null
@@ -21,14 +25,20 @@ class RequestCheck {
 
   rules: any
   requiredMessage: string
+  fieldNameAsKey: boolean
 
   constructor() {
     this.requiredMessage = 'This field is required!'
+    this.fieldNameAsKey = false
     this.rules = {}
   }
 
   setRequiredMessage = (message: string) => {
     this.requiredMessage = message
+  }
+
+  useFieldNameAsKey = () => {
+    this.fieldNameAsKey = true
   }
 
   addRule = (field: string, ...rules: IRule[]) => {
@@ -51,24 +61,28 @@ class RequestCheck {
     }
   }
   
-  check = (...args: Array<any>): Array<ICheck> | undefined => {
-    let invalid: Array<ICheck> = []
+  check = (...args: Array<any>): Array<ICheck> | any | undefined => {
+    let invalid: Array<ICheck> | any = []
     while(args.length) {
       let object = args.shift()
       if(!object || !isObject(object) || isEmptyObject(object)) continue
       let field = Object.keys(object)[0], value = object[field]
-      if(!value && value !== false && value !== 0) invalid.push({ 
-        field, message: this.requiredMessage
-        .replace(':name', field).replace(':field', field).replace(':value', value)
-      })
+      if(!value && value !== false && value !== 0) {
+        this.fieldNameAsKey ?
+          invalid.push({ 
+            [field]: this.requiredMessage
+            .replace(':name', field).replace(':field', field).replace(':value', value)
+          }) : invalid.push({ 
+            field, message: this.requiredMessage
+            .replace(':name', field).replace(':field', field).replace(':value', value)
+          })
+      }
       else if(field in this.rules) {
         let array = [ ...this.rules[field]]
         while(array.length) {
           let validation = array.shift()
           if(!validation.validator(value)) {
-            invalid.push({
-              field, message: validation.message
-            })
+            this.fieldNameAsKey ? invalid.push({ [field]: validation.message }) : invalid.push({ field, message: validation.message})
           }
         }
       }
