@@ -25,20 +25,16 @@ class RequestCheck {
 
   rules: any
   requiredMessage: string
-  fieldNameAsKey: boolean
+  useFieldNameAsKey: boolean
 
   constructor() {
     this.requiredMessage = 'This field is required!'
-    this.fieldNameAsKey = false
+    this.useFieldNameAsKey = false
     this.rules = {}
   }
 
   setRequiredMessage = (message: string) => {
     this.requiredMessage = message
-  }
-
-  useFieldNameAsKey = () => {
-    this.fieldNameAsKey = true
   }
 
   addRule = (field: string, ...rules: IRule[]) => {
@@ -68,7 +64,7 @@ class RequestCheck {
       if(!object || !isObject(object) || isEmptyObject(object)) continue
       let field = Object.keys(object)[0], value = object[field]
       if(!value && value !== false && value !== 0) {
-        this.fieldNameAsKey ?
+        this.useFieldNameAsKey ?
           invalid.push({ 
             [field]: this.requiredMessage
             .replace(':name', field).replace(':field', field).replace(':value', value)
@@ -82,7 +78,7 @@ class RequestCheck {
         while(array.length) {
           let validation = array.shift()
           if(!validation.validator(value)) {
-            this.fieldNameAsKey ? invalid.push({ [field]: validation.message }) : invalid.push({ field, message: validation.message})
+            this.useFieldNameAsKey ? invalid.push({ [field]: validation.message }) : invalid.push({ field, message: validation.message})
           }
         }
       }

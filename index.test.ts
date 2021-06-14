@@ -289,3 +289,41 @@ test('it can check only if is given', () => {
 
   
 })
+
+
+test('it uses field name as key', () => {
+  
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+  rc.useFieldNameAsKey = true
+
+  rc.addFieldsAndRules([
+    {
+      field: 'age', 
+      rules: [
+      { 
+        validator: (age: number) => age > 23, 
+        message: 'The age must be above 23!' 
+      }]
+    }
+  ])
+  
+  const requestBody: any = {
+    age: 20
+  }
+
+  const { age } = requestBody
+
+  const invalid = rc.check(
+    age ? {age} : {} 
+  )
+  
+  expect(invalid).toEqual([
+    { 
+      'age': 'The age must be above 23!' 
+    }
+  ])
+  
+  
+})
