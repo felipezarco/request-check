@@ -31,19 +31,22 @@ class RequestCheck {
                 if (!object || !isObject(object) || isEmptyObject(object))
                     continue;
                 let field = Object.keys(object)[0], value = object[field];
-                if (!value && value !== false && value !== 0)
-                    invalid.push({
+                if (!value && value !== false && value !== 0) {
+                    this.useFieldNameAsKey ?
+                        invalid.push({
+                            [field]: this.requiredMessage
+                                .replace(':name', field).replace(':field', field).replace(':value', value)
+                        }) : invalid.push({
                         field, message: this.requiredMessage
                             .replace(':name', field).replace(':field', field).replace(':value', value)
                     });
+                }
                 else if (field in this.rules) {
                     let array = [...this.rules[field]];
                     while (array.length) {
                         let validation = array.shift();
                         if (!validation.validator(value)) {
-                            invalid.push({
-                                field, message: validation.message
-                            });
+                            this.useFieldNameAsKey ? invalid.push({ [field]: validation.message }) : invalid.push({ field, message: validation.message });
                         }
                     }
                 }
@@ -51,6 +54,7 @@ class RequestCheck {
             return invalid.length ? invalid : undefined;
         };
         this.requiredMessage = 'This field is required!';
+        this.useFieldNameAsKey = false;
         this.rules = {};
     }
 }
