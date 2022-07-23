@@ -2,7 +2,7 @@
 
 > Check whether data is what it is meant to be
 
-You should not always believe the data is exactly what you think it is. Hopefully, you will validate data you received, for example when it comes to one of your controllers. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Therefore, I built my own. It is rather simple and it works.
+You should not always believe the data is exactly what you think. Hopefully, you will validate data you receive. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Therefore, I built this. It is rather simple and it works.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/request-check.svg)](https://badge.fury.io/js/request-check) [![Build Status](https://travis-ci.org/felipezarco/request-check.svg?branch=master)](https://travis-ci.org/felipezarco/request-check) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/request-check/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/request-check?branch=master)  ![Downloads](https://img.shields.io/npm/dw/request-check)
 
@@ -17,36 +17,23 @@ yarn add request-check
 ```
 
 ## Usage
-
 ```typescript
-
 import requestCheck from 'request-check'
-
 import { Request, Response } from 'express'
 
 class UserController {
-
   async create(request: Request, response: Response) {
-
-  const { email, name } = request.body
-  
-  const rc = requestCheck()
-  
-  /* invalid will only avaliate to true if variables pass the check */
-
-  const invalid = rc.check({email}, {name})
-
-  if(invalid) {
-  
-    // Case some invalid
- 
-    response.status(400).json({ invalid })
+    const { email, name } = request.body
+    const rc = requestCheck()
+    /* invalid will only avaliate to true if variables pass the check */
+    const invalid = rc.check({email}, {name})
+    if(invalid) {
+      // Case some invalid
+      response.status(400).json({ invalid })
+    }
+    // Case no invalid...
   }
-  
-  // Case no invalid...
-  
 }
-
 ```
 
 ### Basic Check
@@ -86,7 +73,7 @@ rc.addRule('email', {
 Suppose the variable values:
 
 ```javascript
-const email = 'felipezarco@hotmail.com'
+const email = 'felipe@email.com'
 const name = undefined
 ```
 
@@ -153,29 +140,21 @@ Optionally, you may pass an array of rules as the second argument:
 
 ### Usage Recommendation
 
-```javascript
+```typescript
 import { Request, Response } from 'express'
 import requestCheck from 'request-check'
 import responser from 'responser'
 
 class UserController {
-
   async create(request: Request, response: Response) {
-
     const { email, name } = request.body
-    
     const rc = requestCheck()
-    
     const invalid = rc.check({email}, {name})
-
     if(invalid) {
       response.send_badRequest('Invalid fields!', invalid)
     }
-    
     // ...
-  
   }
-
 }
 ```
 
