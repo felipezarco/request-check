@@ -14,7 +14,14 @@ interface ICheck {
 }
 
 interface ICheckObj {
-  [key: string]: string
+  [key: string]: any
+  isOptionalField?: boolean
+}
+
+interface IInvalidField { 
+  value: any 
+  field: any 
+  message: string 
 }
 
 const isEmptyObject = (object: any) => Object.keys(object).length === 0 && object.constructor === Object
@@ -56,33 +63,55 @@ class RequestCheck {
       this.addRules(fieldAndRule.field, fieldAndRule.rules)
     }
   }
-  
-  check = (...args: Array<any>): Array<ICheck> | any | undefined => {
+
+  buildInvalidField = ({ value, field, message }: IInvalidField) => {
+    if (this.useFieldNameAsKey) {
+      return { [field]: message.replace(':name', field).replace(':field', field).replace(':value', value) }
+    }
+    
+    return {
+      field,
+      message: message.replace(':name', field).replace(':field', field).replace(':value', value)
+    }
+  }
+
+  check = (...args: Array<ICheckObj>): Array<ICheck> | any | undefined => {
     let invalid: Array<ICheck> | any = []
     while(args.length) {
       let object = args.shift()
-      if(!object || !isObject(object) || isEmptyObject(object)) continue
-      let field = Object.keys(object)[0], value = object[field]
-      if(!value && value !== false && value !== 0) {
-        this.useFieldNameAsKey ?
-          invalid.push({ 
-            [field]: this.requiredMessage
-            .replace(':name', field).replace(':field', field).replace(':value', value)
-          }) : invalid.push({ 
-            field, message: this.requiredMessage
-            .replace(':name', field).replace(':field', field).replace(':value', value)
-          })
+      if (!object || !isObject(object) || isEmptyObject(object)) continue
+      const entries = Object.entries(object)
+      const isOptionalField = [true].includes(entries?.find(([entry]) => entry === 'isOptionalField')?.[1])
+
+      const field = entries?.find(([entry]) => entry !== 'isOptionalField')
+      const label = field?.[0]
+      const value = field?.[1]
+
+      const isMissing = [undefined, null].includes(value)
+
+      if (isOptionalField && isMissing) {
+        continue
       }
-      else if(field in this.rules) {
-        let array = [ ...this.rules[field]]
+
+      if (isMissing) {
+        const invalidField = this.buildInvalidField({ value, field: label, message: this.requiredMessage, })
+        invalid.push(invalidField)
+        continue
+      }
+
+      if (label && label in this.rules) {
+        const array = this.rules[label]
+
         while(array.length) {
           let validation = array.shift()
           if(!validation.validator(value)) {
-            this.useFieldNameAsKey ? invalid.push({ [field]: validation.message }) : invalid.push({ field, message: validation.message})
+            const invalidField = this.buildInvalidField({ value, field: label, message: validation.message })
+            invalid.push(invalidField)
           }
         }
       }
     }
+
     return invalid.length ? invalid : undefined
   }
 }
