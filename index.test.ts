@@ -327,3 +327,53 @@ test('it uses field name as key', () => {
   
   
 })
+
+test('it should pass if is an optional field', () => {
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+  rc.useFieldNameAsKey = true
+
+  rc.addFieldsAndRules([{
+    field: 'age', 
+    rules: [{ 
+      validator: (age: number) => age > 23, 
+      message: 'The age must be above 23!' 
+    }]
+  }])
+  
+  const requestBody: any = {
+    age: undefined  
+  }
+
+  const { age } = requestBody
+
+  const invalid = rc.check({ age, isOptionalField: true })
+  
+  expect(invalid).toBeUndefined()
+})
+
+test('it should return an error if is required field', () => {
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+  rc.useFieldNameAsKey = true
+
+  rc.addFieldsAndRules([{
+    field: 'age', 
+    rules: [{ 
+      validator: (age: number) => age > 23, 
+      message: 'The age must be above 23!' 
+    }]
+  }])
+  
+  const requestBody: any = {
+    age: undefined  
+  }
+
+  const { age } = requestBody
+
+  const invalid = rc.check({ age, isOptionalField: false })
+  
+  expect(invalid).toEqual([{ 'age':'The field age is required!'}])
+})

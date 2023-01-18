@@ -87,9 +87,13 @@ class RequestCheck {
       const label = field?.[0]
       const value = field?.[1]
 
-      const isRequired = !isOptionalField && (value === undefined || value === null)
+      const isMissing = [undefined, null].includes(value)
 
-      if (isRequired) {
+      if (isOptionalField && isMissing) {
+        continue
+      }
+
+      if (isMissing) {
         const invalidField = this.buildInvalidField({ value, field: label, message: this.requiredMessage, })
         invalid.push(invalidField)
         continue
