@@ -107,6 +107,23 @@ You can use this if you want to validate only if variable is set:
 In the example above, if age is not given check will not send the required field message. Therefore making `age` an optional field and `name` and `color` required fields. 
 
 Using empty object `{}` instead of `undefined` will work as well.
+
+
+### Optional Validations
+
+Sometimes we want to validate a value if it is given, withouth making it required**.
+
+We can use as shown above `age ? {age} : undefined` or you can use **isOptionalField**
+
+Example:
+
+```javascript
+  const invalid = rc.check({ age, isOptionalField: true })
+```
+
+This will trigger `age` validation _only_ if `age` is given.
+
+If `age` is `undefined`, request-check won't complain.
   
 ### Adding multiple rules
 
@@ -199,6 +216,10 @@ Thanks for your interest in contributing to this repo!
 ## Author
 
 [Luiz Felipe Zarco](https://github.com/felipezarco) (felipezarco@hotmail.com)
+
+## Contributors
+
+[Christopher-Estanis](https://github.com/Christopher-Estanis) (christopher.estanis@gmail.com)
 
 ## License
 
