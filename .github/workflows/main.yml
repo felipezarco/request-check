@@ -4,8 +4,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - run: npm build
-    - run: npm install
+    - run: yarn build
+    - run: yarn install
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
     - uses: phips28/gh-action-bump-version@master
