@@ -374,5 +374,4 @@ test('it should return an error if is required field', () => {
   const invalid = rc.check({ age, isRequiredField: true })
   
   expect(invalid).toEqual([{ field: 'age', message: 'The field age is required!' }])
-
 })
