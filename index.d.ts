@@ -12,7 +12,7 @@ interface ICheck {
 }
 interface ICheckObj {
     [key: string]: any;
-    isOptionalField?: boolean;
+    isRequiredField?: boolean;
 }
 interface IInvalidField {
     value: any;
