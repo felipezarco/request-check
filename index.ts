@@ -15,7 +15,7 @@ interface ICheck {
 
 interface ICheckObj {
   [key: string]: any
-  isOptionalField?: boolean
+  isRequiredField?: boolean
 }
 
 interface IInvalidField { 
@@ -81,13 +81,13 @@ class RequestCheck {
       let object = args.shift()
       if (!object || !isObject(object) || isEmptyObject(object)) continue
       const entries = Object.entries(object)
-      const isOptionalField = [true].includes(entries?.find(([entry]) => entry === 'isOptionalField')?.[1])
+      const isOptionalField = [false].includes(entries?.find(([entry]) => entry === 'isRequiredField')?.[1])
 
-      const field = entries?.find(([entry]) => entry !== 'isOptionalField')
+      const field = entries?.find(([entry]) => entry !== 'isRequiredField')
       const label = field?.[0]
       const value = field?.[1]
 
-      const isMissing = [undefined, null].includes(value)
+      const isMissing = [undefined, null, ''].includes(value)
 
       if (isOptionalField && isMissing) {
         continue
