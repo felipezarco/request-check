@@ -113,12 +113,12 @@ Using empty object `{}` instead of `undefined` will work as well.
 
 Sometimes we want to validate a value if it is given, withouth making it required**.
 
-We can use as shown above `age ? {age} : undefined` or you can use **isOptionalField**
+We can use as shown above `age ? {age} : undefined` or you can use **isRequiredField**
 
 Example:
 
 ```javascript
-  const invalid = rc.check({ age, isOptionalField: true })
+  const invalid = rc.check({ age, isRequiredField: false })
 ```
 
 This will trigger `age` validation _only_ if `age` is given.
