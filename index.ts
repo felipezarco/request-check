@@ -100,7 +100,7 @@ class RequestCheck {
       }
 
       if (label && label in this.rules) {
-        const array = this.rules[label]
+        const array = [...this.rules[label]]
 
         while(array.length) {
           let validation = array.shift()
