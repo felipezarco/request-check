@@ -2,7 +2,7 @@
 
 > Check whether data is what it is meant to be
 
-You should not always believe the data is exactly what you think. Hopefully, you will validate data you receive. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Therefore, I built this. It is rather simple and it works.
+You should not always believe the data is exactly what you think. Hopefully, you validate data you receive. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Therefore, I built this. It is rather simple and it works.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/request-check.svg)](https://badge.fury.io/js/request-check) [![Build Status](https://travis-ci.org/felipezarco/request-check.svg?branch=master)](https://travis-ci.org/felipezarco/request-check) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/request-check/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/request-check?branch=master)  ![Downloads](https://img.shields.io/npm/dw/request-check)
 
@@ -16,7 +16,43 @@ Add `request-check` with your favorite package manager:
 yarn add request-check
 ```
 
-## Usage
+## Simple Usage
+
+```typescript
+  import requestCheck from 'request-check'
+  const rc = requestCheck()
+  
+  const name = undefined
+  const age = 15
+
+  rc.addRule('age', {
+    validator: (age: any) => age > 18, 
+    message: 'You need to be at least 18 years old!'
+  })
+  
+  const invalid = rc.check({ age, name })
+  
+  console.log(invalid)
+  
+```
+
+Above log outputs:
+
+```typescript
+[
+  { 
+    field: 'age', 
+    message: 'You need to be at least 18 years old!' 
+  },
+  { 
+    field: 'name', 
+    message: 'The field name is required!' 
+  }
+]
+```
+  
+
+## Usage Example with Express
 ```typescript
 import requestCheck from 'request-check'
 import { Request, Response } from 'express'
@@ -25,24 +61,30 @@ class UserController {
   async create(request: Request, response: Response) {
     const { email, name } = request.body
     const rc = requestCheck()
-    /* invalid will only avaliate to true if variables pass the check */
     const invalid = rc.check({email}, {name})
+    /* invalid will only avaliate to true if variables pass the check */
+    /* it avaliates to false if a variable is caught on check */
     if(invalid) {
-      // Case some invalid
+      // something INVALID
       response.status(400).json({ invalid })
     }
-    // Case no invalid...
+    // nothing INVALID
   }
 }
 ```
 
 ### Basic Check
 
-This line checks whether those two variables are set.
 
 ```javascript
+  import requestCheck from 'request-check'
+  const rc = requestCheck()
+  const email = 'felipe@email.com'
+  const name = undefined
   const invalid = rc.check({email}, {name})
 ```
+
+The above checks whether those two variables are set.
 
 Check will return an `Array` of objects with `field` and `message` **or** it will return `undefined`.
 
@@ -50,12 +92,11 @@ In the above example, if variables `email` and `name` were not set, invalid will
 
 ```javascript
 [
-  { field: 'name', message: 'The field name is required!' },
-  { field: 'email', message: 'The field email is required!' }
+  { field: 'name', message: 'The field name is required!' }
 ]
 ```
 
-If both variables were set, `check` would return **undefined** and `invalid` would avaliate to `false`.
+If both variables were set, `check` would return **undefined**.
 
 ### Validations
 
@@ -64,26 +105,19 @@ In addition to check if the variable is set, `check` will also look for a rule d
 This is how you can add a rule:
 
 ```typescript
-rc.addRule('email', {
-  validator: (email: any) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
-  message: 'The email given is not valid!'
-})
-```
-
-Suppose the variable values:
-
-```javascript
-const email = 'felipe@email.com'
-const name = undefined
-```
-
-Now, when you call:
-
-```javascript
+  import requestCheck from 'request-check'
+  const rc = requestCheck()
+  rc.addRule('email', {
+    validator: (email: any) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
+    message: 'The email given is not valid!'
+  })
+  const email = 'felipeINVALIDemail.com'
+  const name = undefined
   const invalid = rc.check({email}, {name})
+
 ```
 
-The output stored in `invalid` will contain:
+With that `addRule` before `check`, the previous code would output. 
 
 ```javascript
 [
@@ -92,33 +126,17 @@ The output stored in `invalid` will contain:
 ]
 ```
 
-### Conditional validation
-
-You can use this if you want to validate only if variable is set:
-
-```javascript
-  const invalid = rc.check(
-    {name},
-    {color}, 
-    age ? {age} : undefined
-  ) 
-```
-
-In the example above, if age is not given check will not send the required field message. Therefore making `age` an optional field and `name` and `color` required fields. 
-
-Using empty object `{}` instead of `undefined` will work as well.
-
-
-### Optional Validations
+### Optional validation
 
 Sometimes we want to validate a value if it is given, withouth making it required.
-
-We can use as shown above `age ? {age} : undefined` or you can use **isRequiredField**
 
 Example:
 
 ```javascript
-  const invalid = rc.check({ age, isRequiredField: false })
+  const invalid = rc.check(
+    { name },
+    { age, isRequiredField: false }
+  )
 ```
 
 This will trigger `age` validation _only_ if `age` is given.
@@ -154,8 +172,19 @@ Alternatively, you can add more rules by passing additional arguments to `addRul
     message: 'The age must be under 23!'
   })
 ```
+### Rule Overwrite
+You can use both `overwriteRule` and `overwriteRules` to **overwrite** a previously added rule (instead of stacking the rules).
+ 
 
+```typescript
+  rc.overwriteRule('age', { 
+    validator: (age: number) => age > 18, 
+    message:'You need to be at least 18 years old!' 
+  })
+```
 
+The above code will replace previously addedRules for `age` instead of adding another rule.
+The same applies to `overwriteRules` which will overwrite previous rule(s) with the new rule(s).
 
 ### Usage Recommendation
 

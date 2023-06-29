@@ -18,6 +18,13 @@ class RequestCheck {
                     this.rules[field] = [{ validator, message }];
             }
         };
+        this.overwriteRule = (field, ...rules) => {
+            this.addRule(field, ...rules);
+        };
+        this.overwriteRules = (field, rules) => {
+            console.log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>`, this.rules);
+            this.addRules(field, rules);
+        };
         this.addFieldsAndRules = (fieldsAndRules) => {
             let fieldAndRule = undefined;
             while (fieldAndRule = fieldsAndRules.shift()) {

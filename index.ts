@@ -57,6 +57,16 @@ class RequestCheck {
     }
   }
   
+  overwriteRule = (field: string, ...rules: IRule[]) => {
+    if(field?.length) delete this.rules[field]
+    this.addRule(field, ...rules)
+  }
+  
+  overwriteRules = (field: string, rules: IRule[]) => {
+    if(field?.length) delete this.rules[field]
+    this.addRules(field, rules)
+  }
+  
   addFieldsAndRules = (fieldsAndRules: IFieldsAndRules[]) => {
     let fieldAndRule: IFieldsAndRules | undefined = undefined
     while(fieldAndRule = fieldsAndRules.shift() as IFieldsAndRules | undefined) {

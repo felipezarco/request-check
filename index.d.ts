@@ -27,6 +27,8 @@ declare class RequestCheck {
     setRequiredMessage: (message: string) => void;
     addRule: (field: string, ...rules: IRule[]) => void;
     addRules: (field: string, rules: IRule[]) => void;
+    overwriteRule: (field: string, ...rules: IRule[]) => void;
+    overwriteRules: (field: string, rules: IRule[]) => void;
     addFieldsAndRules: (fieldsAndRules: IFieldsAndRules[]) => void;
     buildInvalidField: ({ value, field, message }: IInvalidField) => {
         [x: number]: string;

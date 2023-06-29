@@ -140,6 +140,111 @@ test('it validates with separated rules from same variable', () => {
 
 })
 
+test('it override previous rules correctly', () => {
+    
+  const rc = requestCheck()
+  
+  rc.requiredMessage = 'The field :name is required!'
+
+  rc.addRule('age', { 
+    validator: (age: number) => age > 18, 
+    message: 'You need to be at least 18 years old!' 
+  })
+
+  rc.overwriteRule('age', {
+    validator: (age: any) => age < 23,
+    message: 'The age must be under 23!'
+  })
+  
+  rc.addRule('color', { validator: (color: any) => color === 'blue', message: 'Color must be blue!'})
+  
+  const requestBodyRule1 = {
+    name: 'Felipe',
+    age: '23',
+    color: 'yellow'
+  }
+
+  const requestBodyRule2 = {
+    name: 'Zarco',
+    age: '13',
+    color: 'yellow'
+  }
+
+  let { name, color, age } = requestBodyRule1
+  const invalidRule1 = rc.check({name}, {age}, {color})
+  expect(invalidRule1).toEqual([
+    { field: 'age', message: 'The age must be under 23!' },
+    { field: 'color', message: 'Color must be blue!' }
+  ])
+  
+  name = requestBodyRule2.name
+  color = requestBodyRule2.color
+  age = requestBodyRule2.age 
+  
+  const invalidRule2 = rc.check({name}, {age}, {color})
+  expect(invalidRule2).toEqual([
+    { field: 'color', message: 'Color must be blue!' }
+  ])
+
+  
+  
+})
+test('it override and add multiple rules correctly', () => {
+    
+  const rc = requestCheck()
+  
+  rc.requiredMessage = 'The field :name is required!'
+
+  rc.addRule('age', { 
+    validator: (age: number) => age > 18, 
+    message: 'You need to be at least 18 years old!' 
+  })
+
+  rc.overwriteRules('age', [{
+      validator: (age: any) => age < 23,
+      message: 'The age must be under 23!'
+    },
+    { 
+      validator: (age: number) => age > 15, 
+      message: 'You need to be at least 15 years old!' 
+    }
+  ])
+  
+  rc.addRule('color', { validator: (color: any) => color === 'blue', message: 'Color must be blue!'})
+  
+  const requestBodyRule1 = {
+    name: 'Felipe',
+    age: '23',
+    color: 'yellow'
+  }
+
+  const requestBodyRule2 = {
+    name: 'Zarco',
+    age: '13',
+    color: 'yellow'
+  }
+
+  let { name, color, age } = requestBodyRule1
+  const invalidRule1 = rc.check({name}, {age}, {color})
+  expect(invalidRule1).toEqual([
+    { field: 'age', message: 'The age must be under 23!' },
+    { field: 'color', message: 'Color must be blue!' }
+  ])
+  
+  name = requestBodyRule2.name
+  color = requestBodyRule2.color
+  age = requestBodyRule2.age 
+  
+  const invalidRule2 = rc.check({name}, {age}, {color})
+  expect(invalidRule2).toEqual([
+    { field: 'age', message: 'You need to be at least 15 years old!' },
+    { field: 'color', message: 'Color must be blue!' },
+  ])
+
+  
+  
+})
+
 test('it add multiple rules by various arguments', () => {
     
   const rc = requestCheck()
