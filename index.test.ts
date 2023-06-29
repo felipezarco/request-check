@@ -70,6 +70,40 @@ test('it validates with more than one function', () => {
 
 })
 
+test('it validates with more than one function (array)', () => {
+  
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+
+  rc.addRules('age', [{ 
+    validator: (age: number) => age > 18, 
+    message:'You need to be at least 18 years old!' 
+  },
+   {
+    validator: (age: any) => age < 23,
+    message: 'The age must be under 23!'
+  }])
+
+  rc.addRule('color', { validator: (color: any) => color === 'blue', message: 'Color must be blue!'})
+
+  const requestBody = {
+    name: 'Zarco',
+    age: '23',
+    color: 'yellow'
+  }
+
+  const { name, color, age } = requestBody
+
+  const invalid = rc.check({name}, {age}, {color})
+
+  expect(invalid).toEqual([
+    { field: 'age', message: 'The age must be under 23!' },
+    { field: 'color', message: 'Color must be blue!' }
+  ])
+
+})
+
 
 test('it validates with separated rules from same variable', () => {
     

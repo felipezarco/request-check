@@ -111,7 +111,7 @@ Using empty object `{}` instead of `undefined` will work as well.
 
 ### Optional Validations
 
-Sometimes we want to validate a value if it is given, withouth making it required**.
+Sometimes we want to validate a value if it is given, withouth making it required.
 
 We can use as shown above `age ? {age} : undefined` or you can use **isRequiredField**
 
@@ -127,20 +127,7 @@ If `age` is `undefined`, request-check won't complain.
   
 ### Adding multiple rules
 
-You can add more rules by passing additional arguments to `addRule`:
-
-```javascript
-  rc.addRule('age', { 
-    validator: (age: number) => age > 18, 
-    message:'You need to be at least 18 years old!' 
-  },
-   {
-    validator: (age: any) => age < 23,
-    message: 'The age must be under 23!'
-  })
-```
-
-Optionally, you may pass an array of rules as the second argument:
+You may use `addRules`, which receives an array of rules as the second argument:
 
 ```javascript
   rc.addRules('age', [
@@ -154,6 +141,21 @@ Optionally, you may pass an array of rules as the second argument:
     }
   ])
 ```
+
+Alternatively, you can add more rules by passing additional arguments to `addRule`, still works:
+
+```javascript
+  rc.addRule('age', { 
+    validator: (age: number) => age > 18, 
+    message:'You need to be at least 18 years old!' 
+  },
+   {
+    validator: (age: any) => age < 23,
+    message: 'The age must be under 23!'
+  })
+```
+
+
 
 ### Usage Recommendation
 
