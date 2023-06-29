@@ -20,17 +20,19 @@ yarn add request-check
 
 ```typescript
   import requestCheck from 'request-check'
+    // const requestCheck = require('request-check').default // use this import for javascript
+
   const rc = requestCheck()
   
   const name = undefined
   const age = 15
 
   rc.addRule('age', {
-    validator: (age: any) => age > 18, 
+    validator: (age) => age > 18, 
     message: 'You need to be at least 18 years old!'
   })
   
-  const invalid = rc.check({ age, name })
+  const invalid = rc.check({ age }, { name })
   
   console.log(invalid)
   
@@ -46,7 +48,7 @@ Above log outputs:
   },
   { 
     field: 'name', 
-    message: 'The field name is required!' 
+    message: 'The field is required!' 
   }
 ]
 ```
@@ -92,7 +94,7 @@ In the above example, if variables `email` and `name` were not set, invalid will
 
 ```javascript
 [
-  { field: 'name', message: 'The field name is required!' }
+  { field: 'name', message: 'The field is required!' }
 ]
 ```
 
@@ -105,10 +107,10 @@ In addition to check if the variable is set, `check` will also look for a rule d
 This is how you can add a rule:
 
 ```typescript
-  import requestCheck from 'request-check'
+  import requestCheck from 'request-check' 
   const rc = requestCheck()
   rc.addRule('email', {
-    validator: (email: any) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
+    validator: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
     message: 'The email given is not valid!'
   })
   const email = 'felipeINVALIDemail.com'
@@ -121,7 +123,7 @@ With that `addRule` before `check`, the previous code would output.
 
 ```javascript
 [
-  { field: 'name', message: 'The field name is required!' },
+  { field: 'name', message: 'This field is required!'},
   { field: 'email', message: 'The email given is not valid!' }
 ]
 ```

@@ -19,10 +19,13 @@ class RequestCheck {
             }
         };
         this.overwriteRule = (field, ...rules) => {
+            if (field?.length)
+                delete this.rules[field];
             this.addRule(field, ...rules);
         };
         this.overwriteRules = (field, rules) => {
-            console.log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>`, this.rules);
+            if (field?.length)
+                delete this.rules[field];
             this.addRules(field, rules);
         };
         this.addFieldsAndRules = (fieldsAndRules) => {
