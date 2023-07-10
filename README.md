@@ -1,45 +1,42 @@
 # Request Check
 
-> Check whether data is what it is meant to be
+> Simplify request validation checks express
 
-You should not always believe the data is exactly what you think. Hopefully, you validate data you receive. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Therefore, I built this. It is rather simple and it works.
+This module checks whether data is what it's meant to be
+You should not always believe the data is exactly what you think. Hopefully, you validate data you receive. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Hence, I built this. It is rather simple and it works.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/request-check.svg)](https://badge.fury.io/js/request-check) [![Build Status](https://travis-ci.org/felipezarco/request-check.svg?branch=master)](https://travis-ci.org/felipezarco/request-check) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/request-check/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/request-check?branch=master)  ![Downloads](https://img.shields.io/npm/dw/request-check)
 
 [![npm](https://nodei.co/npm/request-check.png)](https://www.npmjs.com/package/request-check)
 
-## Install
 
-Add `request-check` with your favorite package manager:
+### Install
 
+Add `request-check` with your favorite [package manager](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable):
 ```bash
-yarn add request-check
+  yarn add request-check
 ```
 
 ## Simple Usage
 
 ```typescript
-  import requestCheck from 'request-check'
-    // const requestCheck = require('request-check').default // use this import for javascript
+import requestCheck from 'request-check'
+// const requestCheck = require('request-check').default
+const rc = requestCheck()
 
-  const rc = requestCheck()
-  
-  const name = undefined
-  const age = 15
+const name = undefined
+const age = 15
 
-  rc.addRule('age', {
-    validator: (age) => age > 18, 
-    message: 'You need to be at least 18 years old!'
-  })
-  
-  const invalid = rc.check({ age }, { name })
-  
-  console.log(invalid)
-  
+rc.addRule('age', {
+  validator: (age) => age > 18, 
+  message: 'You need to be at least 18 years old!'
+})
+
+const invalid = rc.check({ age }, { name })
+
+if (invalid) console.log(invalid)
 ```
-
 Above log outputs:
-
 ```typescript
 [
   { 
@@ -52,27 +49,32 @@ Above log outputs:
   }
 ]
 ```
-  
+It should be noted that the `request-check` performs two tasks in the above code:
+
+- First, it checks whether both properties `age` and `email` were **provided**.
+- Secondly, if they were provided, it proceeds to **validate** the `age` property according to the specified rule.
 
 ## Usage Example with Express
 ```typescript
-import requestCheck from 'request-check'
-import { Request, Response } from 'express'
-
-class UserController {
-  async create(request: Request, response: Response) {
-    const { email, name } = request.body
-    const rc = requestCheck()
-    const invalid = rc.check({email}, {name})
-    /* invalid will only avaliate to true if variables pass the check */
-    /* it avaliates to false if a variable is caught on check */
-    if(invalid) {
-      // something INVALID
-      response.status(400).json({ invalid })
-    }
-    // nothing INVALID
+import express, { Request, Response } from 'express'
+const app = express()
+const router = express.Router()
+app.use(router)
+router.post('/create', (req: Request, res: Response) => {
+  const { email, name } = req.body
+  const rc = requestCheck()
+  const errors = rc.check({email}, {name})
+  if(errors) {
+    return res.status(400).json({
+      status: 'BAD_REQUEST',
+      code: 400,
+      message: 'Request is wrong!',
+      success: false,
+      errors
+    })
   }
-}
+  // continue code, everything checked 
+})
 ```
 
 ### Basic Check
