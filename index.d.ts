@@ -24,6 +24,7 @@ declare class RequestCheck {
     requiredMessage: string;
     useFieldNameAsKey: boolean;
     constructor();
+    clearRules: () => void;
     setRequiredMessage: (message: string) => void;
     addRule: (field: string, ...rules: IRule[]) => void;
     addRules: (field: string, rules: IRule[]) => void;

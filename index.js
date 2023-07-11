@@ -4,6 +4,9 @@ const isEmptyObject = (object) => Object.keys(object).length === 0 && object.con
 const isObject = (object) => typeof object === 'object' && object !== null;
 class RequestCheck {
     constructor() {
+        this.clearRules = () => {
+            this.rules = {};
+        };
         this.setRequiredMessage = (message) => {
             this.requiredMessage = message;
         };

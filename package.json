@@ -24,10 +24,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/felipezarco/request-check.git"
-  },
+  "repository": "git://github.com/felipezarco/request-check.git",
   "devDependencies": {
     "@types/jest": "^26.0.0",
     "coveralls": "^3.1.0",
