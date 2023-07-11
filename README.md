@@ -140,7 +140,7 @@ Which outputs
 ]
 ```
 
-### No errors (Hooray!)
+## No errors (Hooray!)
 
 If all properties passed to `check` are both **set** (1) and **pass the validation functions** (2) of specified rules then `check` will return `undefined`.
 
@@ -161,7 +161,7 @@ Which outputs
 undefined
 ```
 
-### Validations
+## Validations
 
 This is how you can add a rule:
 
@@ -169,7 +169,9 @@ This is how you can add a rule:
 import requestCheck from 'request-check' 
 const rc = requestCheck()
 rc.addRule('email', {
-  validator: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
+  validator: (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email))
+  }, 
   message: 'The email given is not valid!'
 })
 const email = 'felipeINVALIDemail.com'
@@ -183,7 +185,7 @@ const invalid = rc.check({email}, {name})
 ]
 ```
 
-### Optional validation
+## Optional validation
 
 What if you want to **validate a value only if it is was given**, without necessarily making it required?
 
@@ -199,7 +201,7 @@ This will trigger `age` validation _only_ if `age` is given.
 
 If `age` is `undefined` or `null`, `check` won't complain.
   
-### Adding multiple rules
+## Adding multiple rules
 
 To add multiple rules, you may use `addRules`, which receives an array of rules as the second argument:
 
@@ -229,9 +231,9 @@ rc.addRule('age', {
 })
 ```
 
-### Rule Overwrite
+## Rule Overwrite
 
-You can use both `overwriteRule` and `overwriteRules` to **overwrite** a previously added rule (instead of stacking the rules).
+You can use both `overwriteRule` and `overwriteRules` to **overwrite** a previously added rule (instead of stacking a new rule).
 
 ```typescript
 rc.overwriteRule('age', { 
