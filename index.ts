@@ -40,6 +40,10 @@ class RequestCheck {
     this.rules = {}
   }
 
+  clearRules = () => {
+    this.rules = {}
+  }
+
   setRequiredMessage = (message: string) => {
     this.requiredMessage = message
   }

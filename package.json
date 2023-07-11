@@ -1,7 +1,7 @@
 {
   "name": "request-check",
-  "version": "1.5.3",
-  "description": "Checks if request body is given and valid",
+  "version": "1.5.4",
+  "description": "Validate requests required fields and rules on express and other frameworks",
   "main": "index.js",
   "types": "index",
   "scripts": {
@@ -10,17 +10,14 @@
     "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [
+    "validate",
     "request",
-    "validation",
-    "validations",
     "validator",
-    "validity",
+    "functions",
     "payload",
     "body",
-    "functions",
     "check",
-    "express",
-    "content"
+    "express"
   ],
   "author": "Luiz Felipe Zarco <felipezarco@hotmail.com> (https://github.com/felipezarco)",
   "license": "MIT",

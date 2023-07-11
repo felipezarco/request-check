@@ -1,6 +1,6 @@
 # Request Check
 
-> Simplify request validation checks on express
+> Validate requests required fields and rules on express and other frameworks
 
 You should not always believe the data is exactly what you think. Hopefully, you validate data you receive. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Hence, I built this. It is rather simple and it works.
 
@@ -83,7 +83,7 @@ router.post('/create', (req: Request, res: Response) => {
 })
 ```
 
-## Check explained
+## Check method explained
 
 `check` will return an array of objects with `field` and `message` properties if there are any errors after checking for **required fields** (1) and **validation rules** (2) **OR**, if there are none of these errors, it will return `undefined`. 
 
@@ -140,7 +140,7 @@ Which outputs
 ]
 ```
 
-### No errors
+### No errors (Hooray!)
 
 If all properties passed to `check` are both **set** (1) and **pass the validation functions** (2) of specified rules then `check` will return `undefined`.
 
@@ -166,15 +166,15 @@ undefined
 This is how you can add a rule:
 
 ```typescript
-  import requestCheck from 'request-check' 
-  const rc = requestCheck()
-  rc.addRule('email', {
-    validator: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
-    message: 'The email given is not valid!'
-  })
-  const email = 'felipeINVALIDemail.com'
-  const name = undefined
-  const invalid = rc.check({email}, {name})
+import requestCheck from 'request-check' 
+const rc = requestCheck()
+rc.addRule('email', {
+  validator: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)), 
+  message: 'The email given is not valid!'
+})
+const email = 'felipeINVALIDemail.com'
+const name = undefined
+const invalid = rc.check({email}, {name})
 ```
 ```javascript
 [
@@ -185,103 +185,100 @@ This is how you can add a rule:
 
 ### Optional validation
 
-Sometimes we want to validate a value if it is given, withouth making it required.
+What if you want to **validate a value only if it is was given**, without necessarily making it required?
 
-Example:
+In this case, you can add a rule with `isRequiredField` set to `false`:
 
 ```javascript
-  const invalid = rc.check(
-    { name },
-    { age, isRequiredField: false }
-  )
+const invalid = rc.check(
+  { name },
+  { age, isRequiredField: false }
+)
 ```
+This will trigger `age` validation _only_ if `age` is given. 
 
-This will trigger `age` validation _only_ if `age` is given.
-
-If `age` is `undefined`, request-check won't complain.
+If `age` is `undefined` or `null`, `check` won't complain.
   
 ### Adding multiple rules
 
-You may use `addRules`, which receives an array of rules as the second argument:
+To add multiple rules, you may use `addRules`, which receives an array of rules as the second argument:
 
 ```javascript
-  rc.addRules('age', [
-    { 
-      validator: (age: number) => age < 23, 
-      message: 'The age must be under 23!' 
-    },
-    {
-      validator: (age: any) => !isNaN(age),
-      message: 'The age must be a number!'
-    }
-  ])
-```
-
-Alternatively, you can add more rules by passing additional arguments to `addRule`, still works:
-
-```javascript
-  rc.addRule('age', { 
-    validator: (age: number) => age > 18, 
-    message:'You need to be at least 18 years old!' 
+rc.addRules('age', [
+  { 
+    validator: (age: number) => age < 23, 
+    message: 'The age must be under 23!' 
   },
-   {
-    validator: (age: any) => age < 23,
-    message: 'The age must be under 23!'
-  })
+  {
+    validator: (age: any) => !isNaN(age),
+    message: 'The age must be a number!'
+  }
+])
 ```
+
+Alternatively, you can add more rules by passing additional arguments to `addRule`:
+
+```javascript
+rc.addRule('age', { 
+  validator: (age: number) => age > 18, 
+  message:'You need to be at least 18 years old!' 
+},
+  {
+  validator: (age: any) => age < 23,
+  message: 'The age must be under 23!'
+})
+```
+
 ### Rule Overwrite
+
 You can use both `overwriteRule` and `overwriteRules` to **overwrite** a previously added rule (instead of stacking the rules).
- 
 
 ```typescript
-  rc.overwriteRule('age', { 
-    validator: (age: number) => age > 18, 
-    message:'You need to be at least 18 years old!' 
-  })
+rc.overwriteRule('age', { 
+  validator: (age: number) => age > 18, 
+  message:'You need to be at least 18 years old!' 
+})
 ```
 
-The above code will replace previously addedRules for `age` instead of adding another rule.
+The above code will replace previously added rules for `age` instead of just adding another rule.
 The same applies to `overwriteRules` which will overwrite previous rule(s) with the new rule(s).
+
+## Advanced
+
+### Why arguments are separated as objects?
+
+I made `check` arguments separated as objects so that it can grab not only the value but also the field name (property key) and use it in the error message. Also, this allows further options in the same object, such as `isRequiredField: false` (see [Optional validation](#optional-validation)).
+
+### The requestCheck instance
+
+Calling `requestCheck()` method will create a new memory stored `rc` with its own rules. You can use the same instance for multiple requests, but remember that `rc` will check all rules added to it previously.
+
+If you want to use the same instance for multiple requests, you can clear the rules array with `rc.clearRules()`.
+
+You can create a default rule class and export it to use in your project, then overwrite it with `overwriteRule` or `overwriteRules` if needed.
 
 ### Usage Recommendation
 
 ```typescript
-import { Request, Response } from 'express'
+import express, { Request, Response } from 'express'
 import requestCheck from 'request-check'
 import responser from 'responser'
-
-class UserController {
-  async create(request: Request, response: Response) {
-    const { email, name } = request.body
-    const rc = requestCheck()
-    const invalid = rc.check({email}, {name})
-    if(invalid) {
-      response.send_badRequest('Invalid fields!', invalid)
-    }
-    // ...
+const app = express()
+const router = express.Router()
+app.use(responser)
+app.use(router)
+router.get('/hello', (req: Request, res: Response) => {
+  const { email, name } = req.body
+  const rc = requestCheck()
+  const errors = rc.check({email}, {name})
+  if(errors) {
+    res.send_badRequest('Invalid fields!', errors)
   }
-}
+})
 ```
 
-Responser is a simple way to send responses in express. Check it out at: https://www.npmjs.com/package/responser
-
-### Request Check Instance
-
-The `requestCheck()` method will create a new stored `rc` with its own rules.
-
-You can export `rc` or the rules array to another file using module export for better organization.
-
-Remember that while using the same instance, `rc` will check all rules added to it previously. 
-
-### Configuration
-
-You can change the default required message by adding a single line of code:
-
-```javascript
-rc.requiredMessage = 'The field :name was not given =(!'
-```
-
-The symbol `:name` will be replaced with the field name. (Its use is optional)
+Responser is a middleware that helps you send responses with a standard format in your Express app.
+Check it out at: https://www.npmjs.com/package/responser
 
 ## Testing
 

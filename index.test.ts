@@ -514,3 +514,79 @@ test('it should return an error if is required field', () => {
   
   expect(invalid).toEqual([{ field: 'age', message: 'The field age is required!' }])
 })
+
+test('it should return an error if is required field', () => {
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+  rc.useFieldNameAsKey = true
+
+  rc.addFieldsAndRules([{
+    field: 'age', 
+    rules: [{ 
+      validator: (age: number) => age > 23, 
+      message: 'The age must be above 23!' 
+    }]
+  }])
+
+  const requestBody: any = {
+    age: undefined  
+  }
+
+  const { age } = requestBody
+
+  const invalid = rc.check({ age, isRequiredField: true })
+
+  expect(invalid).toEqual([{ 'age': 'The field age is required!' }])
+
+})
+
+test('it clear rules when clearRules method is called', () => {
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+
+  rc.addFieldsAndRules([{
+    field: 'age', 
+    rules: [{ 
+      validator: (age: number) => age > 23, 
+      message: 'The age must be above 23!' 
+    }]
+  }])
+
+  rc.clearRules()
+
+  const requestBody: any = {
+    age: 20  
+  }
+
+  const { age } = requestBody
+
+  const invalid = rc.check({ age, isRequiredField: true })
+
+  expect(invalid).toEqual(undefined)
+
+})
+
+test('it should be optional if requiredFiled is false', () => {
+  const rc = requestCheck()
+  rc.requiredMessage = 'The field :name is required!'
+  rc.addFieldsAndRules([{
+    field: 'age', 
+    rules: [{ 
+      validator: (age: number) => age > 23, 
+      message: 'The age must be above 23!' 
+    }]
+  }])
+
+  const requestBody: any = {
+    age: undefined  
+  }
+
+  const { age } = requestBody
+
+  const invalid = rc.check({ age, isRequiredField: false })
+
+  expect(invalid).toEqual(undefined)
+  
+})
