@@ -1,14 +1,12 @@
 # Request Check
 
-> Simplify request validation checks express
+> Simplify request validation checks on express
 
-This module checks whether data is what it's meant to be
 You should not always believe the data is exactly what you think. Hopefully, you validate data you receive. This module helps with that. I found that many of the validators out there are either incomplete or not fully customizable. Hence, I built this. It is rather simple and it works.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensouvalidatore.org/licenses/MIT) [![npm version](https://badge.fury.io/js/request-check.svg)](https://badge.fury.io/js/request-check) [![Build Status](https://travis-ci.org/felipezarco/request-check.svg?branch=master)](https://travis-ci.org/felipezarco/request-check) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/request-check/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/request-check?branch=master)  ![Downloads](https://img.shields.io/npm/dw/request-check)
 
 [![npm](https://nodei.co/npm/request-check.png)](https://www.npmjs.com/package/request-check)
-
 
 ### Install
 
@@ -21,22 +19,29 @@ Add `request-check` with your favorite [package manager](https://classic.yarnpkg
 
 ```typescript
 import requestCheck from 'request-check'
-// const requestCheck = require('request-check').default
 const rc = requestCheck()
 
+// sample payload
 const name = undefined
 const age = 15
+const email = 'person@mailbox.com'
 
+// add rules
 rc.addRule('age', {
   validator: (age) => age > 18, 
   message: 'You need to be at least 18 years old!'
 })
 
-const invalid = rc.check({ age }, { name })
+// checks required fields and validation rules
+const errors = rc.check(
+  { name },
+  { email }, 
+  { age }
+)
 
-if (invalid) console.log(invalid)
+if (errors) console.log(errors)
 ```
-Above log outputs:
+Above code outputs:
 ```typescript
 [
   { 
@@ -51,8 +56,9 @@ Above log outputs:
 ```
 It should be noted that the `request-check` performs two tasks in the above code:
 
-- First, it checks whether both properties `age` and `email` were **provided**.
-- Secondly, if they were provided, it proceeds to **validate** the `age` property according to the specified rule.
+- First, it checks whether properties `name`, `email` and `age` were **provided** (required fields).
+
+- Secondly, if they were provided, it proceeds to **validate** the `age` property according to the specified rule (validation rules).
 
 ## Usage Example with Express
 ```typescript
@@ -73,38 +79,89 @@ router.post('/create', (req: Request, res: Response) => {
       errors
     })
   }
-  // continue code, everything checked 
+  // continue code, everything is ok 
 })
 ```
 
-### Basic Check
+## Check explained
 
+`check` will return an array of objects with `field` and `message` properties if there are any errors after checking for **required fields** (1) and **validation rules** (2) **OR**, if there are none of these errors, it will return `undefined`. 
 
-```javascript
-  import requestCheck from 'request-check'
-  const rc = requestCheck()
-  const email = 'felipe@email.com'
-  const name = undefined
-  const invalid = rc.check({email}, {name})
+### (1) First check: required fields
+
+If a variable is not set, the `message` will be `The field is required!`.
+```typescript
+  const requestBody = { name: 'Felipe' }
+  const errors = rc.check(
+    { name: requestBody.name }, 
+    { surname: requestBody.surname }
+  )
+  console.log(errors)
 ```
-
-The above checks whether those two variables are set.
-
-Check will return an `Array` of objects with `field` and `message` **or** it will return `undefined`.
-
-In the above example, if variables `email` and `name` were not set, invalid will contain:
-
+Which outputs
 ```javascript
 [
-  { field: 'name', message: 'The field is required!' }
+  { field: 'surname', message: 'The field is required!' }
 ]
 ```
 
-If both variables were set, `check` would return **undefined**.
+#### Change default required message
+
+You can change the default required field message by adding a this line of code:
+
+```javascript
+rc.requiredMessage = 'The field :name was not given =('
+```
+
+The symbol `:name` is optional. It would be replaced with the field name. In the example, the message would be `'The field surname was not given =('`.
+
+### (2) Second check: validation functions
+
+If a variable passed the require check and there is a rule for that variable, `check` will run the validation function. If the variable did not pass the validation, the `message` will be the one specified in the rule.
+
+Example:
+
+```typescript
+  const requestBody = { name: 'Felipe', age: 15 }
+  rc.addRule('age', {
+    validator: (age) => age > 18, 
+    message: 'You need to be at least 18 years old!'
+  })
+  const errors = rc.check(
+    { name: requestBody.name }, 
+    { age: requestBody.age }
+  )
+  console.log(errors)
+```
+Which outputs
+```javascript
+[
+  { field: 'age', message: 'You need to be at least 18 years old!' }
+]
+```
+
+### No errors
+
+If all properties passed to `check` are both **set** (1) and **pass the validation functions** (2) of specified rules then `check` will return `undefined`.
+
+```typescript
+  const requestBody = { name: 'Felipe', age: 23 }
+  rc.addRule('age', {
+    validator: (age) => age > 18, 
+    message: 'You need to be at least 18 years old!'
+  })
+  const errors = rc.check(
+    { name: requestBody.name }, 
+    { age: requestBody.age }
+  )
+  console.log(errors)
+```
+Which outputs
+```javascript
+undefined
+```
 
 ### Validations
-
-In addition to check if the variable is set, `check` will also look for a rule definition for that variable.
 
 This is how you can add a rule:
 
@@ -118,11 +175,7 @@ This is how you can add a rule:
   const email = 'felipeINVALIDemail.com'
   const name = undefined
   const invalid = rc.check({email}, {name})
-
 ```
-
-With that `addRule` before `check`, the previous code would output. 
-
 ```javascript
 [
   { field: 'name', message: 'This field is required!'},
