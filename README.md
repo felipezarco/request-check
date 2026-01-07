@@ -245,6 +245,65 @@ rc.overwriteRule('age', {
 The above code will replace previously added rules for `age` instead of just adding another rule.
 The same applies to `overwriteRules` which will overwrite previous rule(s) with the new rule(s).
 
+## Rules with i18n support
+
+When creating a new rule, you can optionally pass an `i18n` object with `key` and `options` properties. This allows you to easily integrate your own translation system, using the key to look up the translated message and the options for dynamic parameters. The `message` property can be used as a fallback if no translation is found.
+
+Like how `:name`, `:field` and `:value` symbols are replaced in the default message, these same values are also automatically added to the `i18n.options` object for use in translation interpolation.
+
+### Creating a rule with i18n object
+```typescript
+rc.addRule('age', {
+  validator: (value: number) => value > 18,
+  message: 'Field :name invalid. You need to be at least 18 years old',
+  i18n: {
+    key: 'validation.ageMustBeAtLeast18YearsOld',
+    options: { minAge: 18 }
+  }
+})
+```
+
+### The output will be:
+
+```typescript
+[
+  {
+    field: 'age',
+    message: 'Field age invalid. You need to be at least 18 years old',
+    i18n: {
+      key: 'validation.ageMustBeAtLeast18YearsOld',
+      options: { 
+        minAge: 18 ,
+        name: 'age' //Added dynamically with :name symbol
+      }
+    }
+  }
+]
+```
+
+**Note:**
+- The `i18n` field serves as a convenient shortcut for internationalization. The library does not translate messages automatically.
+- You should use the `key` and `options` to fetch the translated message in your own i18n system (e.g using i18next library), and optionally remove the `i18n` field before displaying or returning the error to the end user, since the output object will contain i18n object.
+- We strongly recommend using a middleware or utility function to detect errors with an `i18n` key and convert them to the final translated message before sending the response.
+
+### Example of use with a i18n util/middleware
+
+```typescript
+// i18next translation usage example
+const errors = rc.validate(data);
+if (errors) {
+  const formattedErrors = errors.map(error => {
+    if (error.i18n) {
+      return {
+        ...error,
+        message: i18next.t(error.i18n.key, error.i18n.options) || error.message,
+      };
+    }
+    return error;
+  });
+}
+```
+
 ## Advanced
 
 ### Why arguments are separated as objects?
