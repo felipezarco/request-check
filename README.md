@@ -304,6 +304,44 @@ if (errors) {
 }
 ```
 
+### I18n with useFieldNameAsKey
+
+When using useFieldNameAsKey with new i18n object, the output will change for a string to an object containing the message and i18n object:
+
+```typescript
+[
+  age: {
+    message: 'Field age invalid. You need to be at least 18 years old',
+    i18n: {
+      key: 'validation.ageMustBeAtLeast18YearsOld'
+      options: {
+        someOption: 123
+      }
+    }
+  }
+]
+```
+
+```typescript
+//Example of access
+const invalid = rc.check({ age })
+const error = invalid[0]
+
+const message = error.age.message
+const i18nKey = error.age.i18n.key
+```
+
+It's very similar to how you would use it without i18n, but keep in mind that instead of accessing error.age, you'll need to add an additional layer by accessing error.age.message, and for the translation key error.age.i18n.key.
+Note the structural change when using i18n:
+
+Without i18n: Errors are accessed directly (e.g., error.age)
+
+With i18n: You must access:
+
+- error.age.message → The error message
+
+- error.age.i18n.key → The translation key"
+
 ## Advanced
 
 ### Why arguments are separated as objects?
