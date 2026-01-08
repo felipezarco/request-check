@@ -36,6 +36,22 @@ const isEmptyObject = (object: any) => Object.keys(object).length === 0 && objec
 
 const isObject = (object: any) => typeof object === 'object' && object !== null
 
+const buildI18nMessage = (message: string, field: string, value: any, i18n: II18nMessage): II18nMessage | undefined => {
+  const i18nOptions: Record<string, any> = {}
+  if (i18n.options) {
+    Object.assign(i18nOptions, i18n.options)
+  }
+  if (message.includes(':value')) i18nOptions.value = value
+  if (message.includes(':name')) i18nOptions.name = field
+  if (message.includes(':field')) i18nOptions.field = field
+
+  const result: II18nMessage = { key: i18n.key }
+  if (Object.keys(i18nOptions).length > 0) {
+    result.options = i18nOptions
+  }
+  return result
+}
+
 class RequestCheck {
 
   rules: any
@@ -87,25 +103,25 @@ class RequestCheck {
   }
 
   buildInvalidField = ({ value, field, message, i18n }: IInvalidField) => {
+    const i18nMessage = i18n ? buildI18nMessage(message, field, value, i18n) : undefined
+    const messageReplaced = message.replace(':name', field).replace(':field', field).replace(':value', value)
     if (this.useFieldNameAsKey) {
-      return { [field]: message.replace(':name', field).replace(':field', field).replace(':value', value) }
+      if (i18nMessage) {
+        return {
+          [field]: {
+            message: messageReplaced,
+            i18n: i18nMessage
+          }
+        }
+      }
+      return { [field]: messageReplaced }
     }
-    const result: any= {
+    const result: any = {
       field,
-      message: message.replace(':name', field).replace(':field', field).replace(':value', value)
+      message: messageReplaced
     }
-    if (i18n) {
-      const i18nOptions: Record<string, any> = {}
-      if (i18n.options) {
-        Object.assign(i18nOptions, i18n.options)
-      }
-      if (message.includes(':value')) i18nOptions.value = value
-      if (message.includes(':name')) i18nOptions.name = field
-      if (message.includes(':field')) i18nOptions.field = field
-      result.i18n = { 
-        key: i18n.key,
-        ...(Object.keys(i18nOptions).length > 0 && { options: i18nOptions })
-      }
+    if (i18nMessage) {
+      result.i18n = i18nMessage
     }
     return result
   }
