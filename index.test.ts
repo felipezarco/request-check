@@ -1,6 +1,17 @@
 
 import requestCheck from './index'
 
+const i18nKeys : Record<string, string> = {
+  'rules.test.invalidNameMin': 'You need to have more than {{minNameLength}} characters in name! - I was translated!',
+  'rules.test.invalidNameMustBeString': 'Your name must be a string - I was translated!',
+  'rules.test.invalidBirthdate': 'The {{name}} {{value}} is not valid for field {{field}}! - I was translated!',
+  'rules.test.ageRequirement': 'You need to be at least {{minAge}} years old! - I was translated!',
+  'rules.test.invalidId': 'The value {{value}} is not a valid id! - I was translated!',
+  'rules.test.nameMustBeAString': 'Name must be a string! - I was translated!',
+  'rules.test.invalidName': 'Your name must be a string - I was translated!',
+  'rules.test.invalidNameField': '{{field}} must be a string, but the value {{value}} is not valid for {{name}} - I was translated!'
+}
+
 test('it validates as expected', () => {
   
   const rc = requestCheck()
@@ -599,7 +610,7 @@ test('it should translate a message using i18n.key with i18n.options', () => {
     validator: (name: string) => name.length > minNameLength, 
     message: `You need to have more than ${minNameLength} characters in name!`,
     i18n: {
-      key: 'rules.test.invalidName',
+      key: 'rules.test.invalidNameMin',
       options: { minNameLength }
     }
   })
@@ -611,30 +622,27 @@ test('it should translate a message using i18n.key with i18n.options', () => {
   const name = requestBody.name
 
   const invalid = rc.check({ name })
+  const invalidField = invalid[0]
   // It simulates the translation process
-  const i18nTestMapper = {
-    'rules.test.invalidName': `You need to have more than {{minNameLength}} characters in name! - I was translated!`
-  }
-  const translatedMessage = i18nTestMapper['rules.test.invalidName']
-    .replace('{{minNameLength}}', minNameLength.toString())
-  if(invalid && invalid[0]?.i18n?.key ) {
-    invalid[0].message = translatedMessage
-  }
+  const translatedMessage = i18nKeys[invalid[0]?.i18n?.key]
+    .replace('{{minNameLength}}', invalid[0]?.i18n?.options?.minNameLength.toString())
+  
+  invalid[0].message = translatedMessage
+  
+  expect(invalid[0].i18n.options.minNameLength).toBe(minNameLength)
+
   expect(invalid).toEqual([
     { 
       field: 'name', 
       message: 'You need to have more than 10 characters in name! - I was translated!', 
       i18n: {
-        key: 'rules.test.invalidName',
+        key: 'rules.test.invalidNameMin',
         options: {
           minNameLength
         }
       }
     }
   ])
-  
-  expect(invalid[0].i18n.key).toBe('rules.test.invalidName')
-  expect(invalid[0].i18n.options.minNameLength).toBe(minNameLength)
 })
 
 test('it should translate a message using i18n.key without i18n.options object', () => {
@@ -643,7 +651,7 @@ test('it should translate a message using i18n.key without i18n.options object',
   rc.addRule('name', { 
     validator: (name: string) => typeof name === 'string', 
     message: `Your name must be a string`,
-    i18n: { key: 'rules.test.invalidName' }
+    i18n: { key: 'rules.test.invalidNameMustBeString' }
   })
 
   const requestBody = {
@@ -653,31 +661,23 @@ test('it should translate a message using i18n.key without i18n.options object',
   const name = requestBody.name
 
   const invalid = rc.check({ name })
+  
   expect(invalid[0].message).toBe('Your name must be a string')
+  expect(invalid[0].i18n.options).toBeUndefined()
 
   // It simulates the translation process
-  const i18nTestMapper = {
-    'rules.test.invalidName': `Your name must be a string - I was translated!`
-  }
-  const translatedMessage = i18nTestMapper['rules.test.invalidName']
-  if(invalid.length && invalid[0]?.i18n?.key ) {
-    invalid[0].message = translatedMessage
-  }
+  const translatedMessage = i18nKeys[invalid[0]?.i18n?.key]
+  invalid[0].message = translatedMessage
+  
   expect(invalid).toEqual([
-    { 
-      field: 'name', 
+    {
+      field: 'name',
       message: 'Your name must be a string - I was translated!', 
       i18n: {
-        key: 'rules.test.invalidName'
+        key: 'rules.test.invalidNameMustBeString'
       }
     }
   ])
-
-  const error = invalid[0]
-  
-  expect(error.i18n.key).toBe('rules.test.invalidName')
-  expect(error.i18n.options).toBeUndefined()
-  expect(error.message).toBe('Your name must be a string - I was translated!')
 })
 
 test('it should translate a key with interpolation using :name, :value and :field replace', () => {
@@ -699,41 +699,23 @@ test('it should translate a key with interpolation using :name, :value and :fiel
   const birthdate = fieldValue
 
   const invalid = rc.check({ birthdate })
-  expect(invalid).toEqual([
-    { 
-      field: 'birthdate',
-      message: 'The birthdate 1990-05-20 is not valid for field birthdate!',
-      i18n: {
-        key: 'rules.test.invalidBirthdate',
-        options: {
-          someOtherOption: 123,
-          value: fieldValue,
-          name: fieldName,
-          field: fieldName
-        }
-      }
-    }
-  ])
+
+  expect(invalid[0].message).toBe('The birthdate 1990-05-20 is not valid for field birthdate!')
   
   // It simulates the translation process
-  const i18nTestMapper = {
-    'rules.test.invalidBirthdate': `The {{name}} {{value}} is not valid for field {{field}}! - I was translated!`
-  }
-  
-  const translationKey = invalid[0].i18n.key as keyof typeof i18nTestMapper
+  const translationKey = invalid[0].i18n.key
   const translationOptions = invalid[0].i18n.options
-  const translatedMessage = i18nTestMapper[translationKey]
+
+  const translatedMessage = i18nKeys[translationKey]
     .replace('{{name}}', translationOptions.name)
     .replace('{{value}}', translationOptions.value)
     .replace('{{field}}', translationOptions.field)
-  
-  expect(translatedMessage).toBe(
-    `The birthdate 1990-05-20 is not valid for field birthdate! - I was translated!`
-  )
 
   invalid[0].message = translatedMessage
-
-  expect(invalid[0].message).toBe(translatedMessage)
+  expect(invalid[0].message).toBe(
+    'The birthdate 1990-05-20 is not valid for field birthdate! - I was translated!'
+  )
+    
   expect(invalid).toEqual([
     { 
       field: 'birthdate',
@@ -811,27 +793,21 @@ test('it should work with or without i18n object, translating only especified fi
     { birthdate }
   )
 
-  const i18nTestMapper = {
-    'rules.test.nameMustBeAString': `Name must be a string! - I was translated!`,
-    'rules.test.invalidId': `The value {{value}} is not a valid id! - I was translated!`,
-    'rules.test.ageRequirement': `You need to be at least {{minAge}} years old! - I was translated!`
+  const nameField = invalid.find((err: any) => err.field === 'name')
+  if(nameField) {
+    nameField.message = i18nKeys[nameField.i18n.key]
   }
 
-  const nameError = invalid.find((err: any) => err.i18n.key === 'rules.test.nameMustBeAString')
-  if(nameError) {
-    nameError.message = i18nTestMapper[nameError.i18n.key as keyof typeof i18nTestMapper]
+  const ageField = invalid.find((err: any) => err.field === 'age')
+  if(ageField) {
+    ageField.message = i18nKeys[ageField.i18n.key]
+      .replace('{{minAge}}', ageField.i18n.options?.minAge?.toString())
   }
 
-  const ageError = invalid.find((err: any) => err.i18n.key === 'rules.test.ageRequirement')
-  if(ageError) {
-    ageError.message = i18nTestMapper[ageError.i18n.key as keyof typeof i18nTestMapper]
-      .replace('{{minAge}}', minAge.toString())
-  }
-
-  const idError = invalid.find((err: any) => err.i18n.key === 'rules.test.invalidId')
-  if(idError) {
-    idError.message = i18nTestMapper[idError.i18n.key as keyof typeof i18nTestMapper]
-      .replace('{{value}}', id)
+  const idField = invalid.find((err: any) => err.field === 'id')
+  if(idField) {
+    idField.message = i18nKeys[idField.i18n.key]
+      .replace('{{value}}', idField.i18n.options?.value?.toString())
   }
 
   expect(invalid).toEqual([
@@ -895,7 +871,7 @@ test('it override a rule adding i18n', () => {
   rc.overwriteRule('age', {
     validator: (age: number) => age > 18,
     message: 'You need to be at least 18 years old!',
-    i18n: { key: 'rules.test.ageRequirement'  }
+    i18n: { key: 'rules.test.ageRequirement' }
   })
 
   const invalidAfterOverwrite = rc.check({age})
@@ -915,41 +891,38 @@ test('it should translate with useFieldNameAsKey configuration activated', () =>
 
   rc.addRule('name', { 
     validator: (name: string) => typeof name === 'string', 
-    message: `Your name must be a string`,
-    i18n: { key: 'rules.test.invalidName' }
+    message: 'Your name must be a string',
+    i18n: { key: 'rules.test.invalidNameMustBeString' }
   })
 
   const requestBody = {
     name: 123, 
   }
+
   const name = requestBody.name
 
   const invalid = rc.check({ name })
-  expect(invalid[0].name.message).toBe('Your name must be a string')
+  const nameField = invalid[0].name
+
+  expect(nameField.message).toBe('Your name must be a string')
+  expect(nameField.i18n.options).toBeUndefined()
 
   // It simulates the translation process
-  const i18nTestMapper = {
-    'rules.test.invalidName': `Your name must be a string - I was translated!`
+  const translatedMessage = i18nKeys[nameField.i18n.key]
+  if(invalid.length && nameField.i18n.key) {
+    nameField.message = translatedMessage
   }
-  const translatedMessage = i18nTestMapper['rules.test.invalidName']
-  if(invalid.length && invalid[0]?.name?.i18n?.key ) {
-    invalid[0].name.message = translatedMessage
-  }
+
   expect(invalid).toEqual([
     { 
       name: {
         message: 'Your name must be a string - I was translated!', 
         i18n: {
-          key: 'rules.test.invalidName' 
+          key: 'rules.test.invalidNameMustBeString' 
         }
       }
     }
   ])
-  const error = invalid[0].name
-  
-  expect(error.i18n.key).toBe('rules.test.invalidName')
-  expect(error.i18n.options).toBeUndefined()
-  expect(error.message).toBe('Your name must be a string - I was translated!')
 })
 
 test('it should translate with useFieldNameAsKey configuration activated and add :name, :value and :field in i18n.options', () => {
@@ -960,7 +933,7 @@ test('it should translate with useFieldNameAsKey configuration activated and add
     validator: (name: string) => typeof name === 'string', 
     message: `:field must be a string, but the value :value is not valid for :name`,
     i18n: { 
-      key: 'rules.test.invalidName',
+      key: 'rules.test.invalidNameField',
       options: { someOtherOption: 123 }
     }
   })
@@ -971,26 +944,26 @@ test('it should translate with useFieldNameAsKey configuration activated and add
   const name = requestBody.name
 
   const invalid = rc.check({ name })
-  expect(invalid[0].name.message).toBe('name must be a string, but the value 123 is not valid for name')
+  const nameField = invalid[0].name
+
+  expect(nameField.message).toBe('name must be a string, but the value 123 is not valid for name')
   
   // It simulates the translation process
-  const i18nTestMapper = {
-    'rules.test.invalidName': `{{field}} must be a string, but the value {{value}} is not valid for {{name}} - I was translated!`
-  }
-  const translatedMessage = i18nTestMapper['rules.test.invalidName']
-    .replace('{{field}}', 'name')
-    .replace('{{value}}', '123')
-    .replace('{{name}}', 'name')
+  const translatedMessage = i18nKeys[nameField.i18n.key]
+    .replace('{{field}}', nameField.i18n.options?.field)
+    .replace('{{value}}', String(nameField.i18n.options?.value))
+    .replace('{{name}}', nameField.i18n.options?.name)
   
-  if(invalid.length && invalid[0]?.name?.i18n?.key ) {
-    invalid[0].name.message = translatedMessage
+  if(invalid.length && nameField.i18n.key ) {
+    nameField.message = translatedMessage
   }
+
   expect(invalid).toEqual([
     { 
       name: {
         message: 'name must be a string, but the value 123 is not valid for name - I was translated!', 
         i18n: {
-          key: 'rules.test.invalidName' ,
+          key: 'rules.test.invalidNameField' ,
           options: {
             someOtherOption: 123,
             value: 123,
@@ -1001,14 +974,4 @@ test('it should translate with useFieldNameAsKey configuration activated and add
       }
     }
   ])
-  const error = invalid[0].name
-  
-  expect(error.i18n.key).toBe('rules.test.invalidName')
-  expect(error.i18n.options).toEqual({
-    someOtherOption: 123,
-    value: 123,
-    name: 'name',
-    field: 'name'
-  })
-  expect(error.message).toBe('name must be a string, but the value 123 is not valid for name - I was translated!')
 })
