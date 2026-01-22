@@ -245,6 +245,139 @@ rc.overwriteRule('age', {
 The above code will replace previously added rules for `age` instead of just adding another rule.
 The same applies to `overwriteRules` which will overwrite previous rule(s) with the new rule(s).
 
+## Rules with i18n support
+
+When creating a new rule, you can optionally pass an `i18n` object with `key` and `options` properties. This allows you to easily integrate your own translation system, using the key to look up the translated message and the options for dynamic parameters. The `message` property can be used as a fallback if no translation is found.
+
+Like how `:name`, `:field` and `:value` symbols are replaced in the default message, these same values are also automatically added to the `i18n.options` object for use in translation interpolation.
+
+### Creating a rule with i18n object
+```typescript
+rc.addRule('age', {
+  validator: (value: number) => value > 18,
+  message: 'Field :name invalid. You need to be at least 18 years old',
+  i18n: {
+    key: 'validation.ageMustBeAtLeast18YearsOld',
+    options: { minAge: 18 }
+  }
+})
+```
+
+### The output will be:
+
+```typescript
+[
+  {
+    field: 'age',
+    message: 'Field age invalid. You need to be at least 18 years old',
+    i18n: {
+      key: 'validation.ageMustBeAtLeast18YearsOld',
+      options: { 
+        minAge: 18 ,
+        name: 'age' //Added dynamically with :name symbol
+      }
+    }
+  }
+]
+```
+
+**Note:**
+- The `i18n` field serves as a convenient shortcut for internationalization. The library does not translate messages automatically.
+- You should use the `key` and `options` to fetch the translated message in your own i18n system (e.g using i18next library), and optionally remove the `i18n` field before displaying or returning the error to the end user, since the output object will contain i18n object.
+- We strongly recommend using a middleware or utility function to detect errors with an `i18n` key and convert them to the final translated message before sending the response.
+
+### Example of use with a i18n util/middleware
+
+```typescript
+// i18next translation usage example
+const errors = rc.validate(data);
+if (errors) {
+  const formattedErrors = errors.map(error => {
+    if (error.i18n) {
+      return {
+        ...error,
+        message: i18next.t(error.i18n.key, error.i18n.options) || error.message,
+      };
+    }
+    return error;
+  });
+}
+```
+
+### useFieldNameAsKey combined with i18n
+
+When the option useFieldNameAsKey = true is enabled, the validation result becomes an array of objects where:
+
+- The key is the validated field name.
+- The value is the corresponding error message.
+
+#### Basic example (without i18n)
+```tsx
+const rc = requestCheck()
+rc.useFieldNameAsKey = true
+
+rc.addRule('age', { 
+  validator: (age: number) => age > 23, 
+  message: 'The age must be above 23!'
+})
+
+const age = 20
+const invalid = rc.check({ age })
+```
+
+Output
+```json
+[
+  { "age": "The age must be above 23!" }
+]
+```
+
+In this case, the value associated with the field is simply a string containing the error message.
+
+#### Combining useFieldNameAsKey + i18n
+
+When you add the i18n property to the validation rule, the return format is automatically adjusted to include both the message and the translation key.
+
+Example with i18n
+```tsx
+const rc = requestCheck()
+rc.useFieldNameAsKey = true
+
+rc.addRule('age', { 
+  validator: (age: number) => age > 23, 
+  message: 'The age must be above 23!',
+  i18n: 'validation.ageMustBeAbove23' // When i18n is defined, output for field becomes { "field": { message, i18n } }
+})
+
+const age = 20
+const invalid = rc.check({ age })
+```
+Output
+
+```json
+[
+  {
+    "age": {
+      "message": "The age must be above 23!",
+      "i18n": {
+        "key": "validation.ageMustBeAbove23"
+      }
+    }
+  }
+]
+```
+
+Return Behavior
+
+The return format depends on whether the i18n property is present:
+
+| Configuration                        | Field value structure                        |
+|-------------------------------------|-------------------------------------------|
+| useFieldNameAsKey = true (without i18n) | string                                    |
+| useFieldNameAsKey = true (with i18n) | { message: string, i18n: { key: string, options?: Record<string, any> } }         |
+
+> ⚠️ Important: The return format only changes for `useFieldNameAsKey = true` when `i18n` property is defined. Otherwise, the return remains a simple string containing the error message.
+
 ## Advanced
 
 ### Why arguments are separated as objects?

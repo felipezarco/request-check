@@ -1,6 +1,7 @@
 interface IRule {
   validator: Function
   message: string
+  i18n?: II18nMessage
 }
 
 interface IFieldsAndRules {
@@ -11,6 +12,7 @@ interface IFieldsAndRules {
 interface ICheck {
   field: string
   message: string
+  i18n?: II18nMessage
 }
 
 interface ICheckObj {
@@ -22,11 +24,33 @@ interface IInvalidField {
   value: any 
   field: any 
   message: string 
+  i18n?: II18nMessage
+}
+
+interface II18nMessage {
+  key: string
+  options?: Record<string, any>
 }
 
 const isEmptyObject = (object: any) => Object.keys(object).length === 0 && object.constructor === Object
 
 const isObject = (object: any) => typeof object === 'object' && object !== null
+
+const buildI18nMessage = (message: string, field: string, value: any, i18n: II18nMessage): II18nMessage | undefined => {
+  const i18nOptions: Record<string, any> = {}
+  if (i18n.options) {
+    Object.assign(i18nOptions, i18n.options)
+  }
+  if (message.includes(':value')) i18nOptions.value = value
+  if (message.includes(':name')) i18nOptions.name = field
+  if (message.includes(':field')) i18nOptions.field = field
+
+  const result: II18nMessage = { key: i18n.key }
+  if (Object.keys(i18nOptions).length > 0) {
+    result.options = i18nOptions
+  }
+  return result
+}
 
 class RequestCheck {
 
@@ -55,9 +79,9 @@ class RequestCheck {
   addRules = (field: string, rules: IRule[]) => {
     let rule: IRule | undefined = undefined
     while(rule = rules.shift() as IRule | undefined) {
-      let { validator, message } = rule
-      field in this.rules ? this.rules[field].push({ validator, message }) : 
-      this.rules[field] = [{ validator, message }]
+      let { validator, message, i18n } = rule
+      field in this.rules ? this.rules[field].push({ validator, message, i18n }) : 
+      this.rules[field] = [{ validator, message, i18n }]
     }
   }
   
@@ -78,15 +102,28 @@ class RequestCheck {
     }
   }
 
-  buildInvalidField = ({ value, field, message }: IInvalidField) => {
+  buildInvalidField = ({ value, field, message, i18n }: IInvalidField) => {
+    const i18nMessage = i18n ? buildI18nMessage(message, field, value, i18n) : undefined
+    const messageReplaced = message.replace(':name', field).replace(':field', field).replace(':value', value)
     if (this.useFieldNameAsKey) {
-      return { [field]: message.replace(':name', field).replace(':field', field).replace(':value', value) }
+      if (i18nMessage) {
+        return {
+          [field]: {
+            message: messageReplaced,
+            i18n: i18nMessage
+          }
+        }
+      }
+      return { [field]: messageReplaced }
     }
-    
-    return {
+    const result: any = {
       field,
-      message: message.replace(':name', field).replace(':field', field).replace(':value', value)
+      message: messageReplaced
     }
+    if (i18nMessage) {
+      result.i18n = i18nMessage
+    }
+    return result
   }
 
   check = (...args: Array<ICheckObj>): Array<ICheck> | any | undefined => {
@@ -119,7 +156,7 @@ class RequestCheck {
         while(array.length) {
           let validation = array.shift()
           if(!validation.validator(value)) {
-            const invalidField = this.buildInvalidField({ value, field: label, message: validation.message })
+            const invalidField = this.buildInvalidField({ value, field: label, message: validation.message, i18n: validation.i18n })
             invalid.push(invalidField)
           }
         }
