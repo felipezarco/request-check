@@ -304,43 +304,79 @@ if (errors) {
 }
 ```
 
-### I18n with useFieldNameAsKey
+### useFieldNameAsKey combined with i18n
 
-When using useFieldNameAsKey with new i18n object, the output will change for a string to an object containing the message and i18n object:
+When the option useFieldNameAsKey = true is enabled, the validation result becomes an array of objects where:
 
-```typescript
+- The key is the validated field name.
+- The value is the corresponding error message.
+
+#### Basic example (without i18n)
+```tsx
+const rc = requestCheck()
+rc.useFieldNameAsKey = true
+
+rc.addRule('age', { 
+  validator: (age: number) => age > 23, 
+  message: 'The age must be above 23!'
+})
+
+const age = 20
+const invalid = rc.check({ age })
+```
+
+Output
+```json
 [
-  age: {
-    message: 'Field age invalid. You need to be at least 18 years old',
-    i18n: {
-      key: 'validation.ageMustBeAtLeast18YearsOld'
-      options: {
-        someOption: 123
+  { "age": "The age must be above 23!" }
+]
+```
+
+In this case, the value associated with the field is simply a string containing the error message.
+
+#### Combining useFieldNameAsKey + i18n
+
+When you add the i18n property to the validation rule, the return format is automatically adjusted to include both the message and the translation key.
+
+Example with i18n
+```tsx
+const rc = requestCheck()
+rc.useFieldNameAsKey = true
+
+rc.addRule('age', { 
+  validator: (age: number) => age > 23, 
+  message: 'The age must be above 23!',
+  i18n: 'validation.ageMustBeAbove23' // When i18n is defined, output for field becomes { "field": { message, i18n } }
+})
+
+const age = 20
+const invalid = rc.check({ age })
+```
+Output
+
+```json
+[
+  {
+    "age": {
+      "message": "The age must be above 23!",
+      "i18n": {
+        "key": "validation.ageMustBeAbove23"
       }
     }
   }
 ]
 ```
 
-```typescript
-//Example of access
-const invalid = rc.check({ age })
-const error = invalid[0]
+Return Behavior
 
-const message = error.age.message
-const i18nKey = error.age.i18n.key
-```
+The return format depends on whether the i18n property is present:
 
-It's very similar to how you would use it without i18n, but keep in mind that instead of accessing error.age, you'll need to add an additional layer by accessing error.age.message, and for the translation key error.age.i18n.key.
-Note the structural change when using i18n:
+| Configuration                        | Field value structure                        |
+|-------------------------------------|-------------------------------------------|
+| useFieldNameAsKey = true (without i18n) | string                                    |
+| useFieldNameAsKey = true (with i18n) | { message: string, i18n: string }         |
 
-Without i18n: Errors are accessed directly (e.g., error.age)
-
-With i18n: You must access:
-
-- error.age.message → The error message
-
-- error.age.i18n.key → The translation key"
+> ⚠️ Important: The return format only changes for `useFieldNameAsKey = true` when `i18n` property is defined. Otherwise, the return remains a simple string containing the error message.
 
 ## Advanced
 
