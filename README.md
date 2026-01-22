@@ -374,7 +374,7 @@ The return format depends on whether the i18n property is present:
 | Configuration                        | Field value structure                        |
 |-------------------------------------|-------------------------------------------|
 | useFieldNameAsKey = true (without i18n) | string                                    |
-| useFieldNameAsKey = true (with i18n) | { message: string, i18n: string }         |
+| useFieldNameAsKey = true (with i18n) | { message: string, i18n: { key: string, options?: Record<string, any> } }         |
 
 > ⚠️ Important: The return format only changes for `useFieldNameAsKey = true` when `i18n` property is defined. Otherwise, the return remains a simple string containing the error message.
 
