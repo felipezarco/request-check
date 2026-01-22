@@ -1,6 +1,7 @@
 interface IRule {
     validator: Function;
     message: string;
+    i18n?: II18nMessage;
 }
 interface IFieldsAndRules {
     field: string;
@@ -9,6 +10,7 @@ interface IFieldsAndRules {
 interface ICheck {
     field: string;
     message: string;
+    i18n?: II18nMessage;
 }
 interface ICheckObj {
     [key: string]: any;
@@ -18,6 +20,11 @@ interface IInvalidField {
     value: any;
     field: any;
     message: string;
+    i18n?: II18nMessage;
+}
+interface II18nMessage {
+    key: string;
+    options?: Record<string, any>;
 }
 declare class RequestCheck {
     rules: any;
@@ -31,14 +38,7 @@ declare class RequestCheck {
     overwriteRule: (field: string, ...rules: IRule[]) => void;
     overwriteRules: (field: string, rules: IRule[]) => void;
     addFieldsAndRules: (fieldsAndRules: IFieldsAndRules[]) => void;
-    buildInvalidField: ({ value, field, message }: IInvalidField) => {
-        [x: number]: string;
-        field?: undefined;
-        message?: undefined;
-    } | {
-        field: any;
-        message: string;
-    };
+    buildInvalidField: ({ value, field, message, i18n }: IInvalidField) => any;
     check: (...args: Array<ICheckObj>) => Array<ICheck> | any | undefined;
 }
 declare const requestCheck: () => RequestCheck;

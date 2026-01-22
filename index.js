@@ -2,6 +2,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const isEmptyObject = (object) => Object.keys(object).length === 0 && object.constructor === Object;
 const isObject = (object) => typeof object === 'object' && object !== null;
+const buildI18nMessage = (message, field, value, i18n) => {
+    const i18nOptions = {};
+    if (i18n.options) {
+        Object.assign(i18nOptions, i18n.options);
+    }
+    if (message.includes(':value'))
+        i18nOptions.value = value;
+    if (message.includes(':name'))
+        i18nOptions.name = field;
+    if (message.includes(':field'))
+        i18nOptions.field = field;
+    const result = { key: i18n.key };
+    if (Object.keys(i18nOptions).length > 0) {
+        result.options = i18nOptions;
+    }
+    return result;
+};
 class RequestCheck {
     constructor() {
         this.clearRules = () => {
@@ -16,9 +33,9 @@ class RequestCheck {
         this.addRules = (field, rules) => {
             let rule = undefined;
             while (rule = rules.shift()) {
-                let { validator, message } = rule;
-                field in this.rules ? this.rules[field].push({ validator, message }) :
-                    this.rules[field] = [{ validator, message }];
+                let { validator, message, i18n } = rule;
+                field in this.rules ? this.rules[field].push({ validator, message, i18n }) :
+                    this.rules[field] = [{ validator, message, i18n }];
             }
         };
         this.overwriteRule = (field, ...rules) => {
@@ -37,14 +54,28 @@ class RequestCheck {
                 this.addRules(fieldAndRule.field, fieldAndRule.rules);
             }
         };
-        this.buildInvalidField = ({ value, field, message }) => {
+        this.buildInvalidField = ({ value, field, message, i18n }) => {
+            const i18nMessage = i18n ? buildI18nMessage(message, field, value, i18n) : undefined;
+            const messageReplaced = message.replace(':name', field).replace(':field', field).replace(':value', value);
             if (this.useFieldNameAsKey) {
-                return { [field]: message.replace(':name', field).replace(':field', field).replace(':value', value) };
+                if (i18nMessage) {
+                    return {
+                        [field]: {
+                            message: messageReplaced,
+                            i18n: i18nMessage
+                        }
+                    };
+                }
+                return { [field]: messageReplaced };
             }
-            return {
+            const result = {
                 field,
-                message: message.replace(':name', field).replace(':field', field).replace(':value', value)
+                message: messageReplaced
             };
+            if (i18nMessage) {
+                result.i18n = i18nMessage;
+            }
+            return result;
         };
         this.check = (...args) => {
             let invalid = [];
@@ -71,7 +102,7 @@ class RequestCheck {
                     while (array.length) {
                         let validation = array.shift();
                         if (!validation.validator(value)) {
-                            const invalidField = this.buildInvalidField({ value, field: label, message: validation.message });
+                            const invalidField = this.buildInvalidField({ value, field: label, message: validation.message, i18n: validation.i18n });
                             invalid.push(invalidField);
                         }
                     }
