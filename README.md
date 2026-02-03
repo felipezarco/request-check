@@ -394,18 +394,18 @@ rc.setRequiredMessage(
 
 // Method 2: Direct property assignment
 rc.i18nRequiredMessage = {
-  key: 'validation.requiredField',
+  key: 'validation.required',
   options: { }
 }
 
 ```
 Both methods will add into output:
-```json
+```tsx
 {
-  "field": "name",
-  "message": "This field is required",
-  "i18n": { // <--- //Added
-    "key": "validation.required"
+  field: 'name',
+  message: 'This field is required',
+  i18n: { // <--- //Added
+    key: 'validation.required'
   }
 }
 ```
