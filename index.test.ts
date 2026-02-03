@@ -977,10 +977,50 @@ test('it should translate with useFieldNameAsKey configuration activated and add
   ])
 })
 
-test('it should use requiredMessage with i18n', () => {
+test('it should use requiredMessage with i18n using setRequiredMessage setter', () => {
   const rc = requestCheck()
 
   rc.setRequiredMessage('The field :name is required!', { key: 'rules.required.message' })
+
+  const requestBody: any = {
+    age: undefined  
+  }
+  const age = requestBody.age
+
+  const invalid = rc.check({ age })
+  const ageField = invalid[0]
+
+  // It simulates the translation process
+  expect(invalid).toEqual([
+    { 
+      field: "age",
+      message: "The field age is required!",
+      i18n: {
+        key: 'rules.required.message',
+        options: { name: 'age'}
+      }
+    }
+  ])
+
+  const translatedMessage = i18nKeys[ageField.i18n.key]
+      .replace('{{name}}', ageField.i18n.options?.name)
+
+  ageField.message = translatedMessage
+  delete ageField.i18n
+
+  expect(invalid).toEqual([
+    { 
+      field: "age",
+      message: "The field age is required! - I was translated!"
+    }
+  ])
+})
+
+test('it should use requiredMessage with i18n using i18nRequiredMessage property attribution', () => {
+  const rc = requestCheck()
+
+  rc.requiredMessage = 'The field :name is required!'
+  rc.i18nRequiredMessage = { key: 'rules.required.message' }
 
   const requestBody: any = {
     age: undefined  
