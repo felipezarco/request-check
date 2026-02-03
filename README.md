@@ -378,6 +378,27 @@ The return format depends on whether the i18n property is present:
 
 > ⚠️ Important: The return format only changes for `useFieldNameAsKey = true` when `i18n` property is defined. Otherwise, the return remains a simple string containing the error message.
 
+#### Change default required message with i18n
+
+To enable automatic translation of required messages, you can attach i18n configuration objects:
+
+```tsx
+// Method 1: Using setter with i18n
+rc.setRequiredMessage(
+  'This field is required', // Fallback message
+  { 
+    key: 'validation.required', 
+    options: { } // Dynamic variables
+  }
+)
+
+// Method 2: Direct property assignment
+rc.i18nRequiredMessage = {
+  key: 'validation.requiredField',
+  options: { }
+}
+```
+
 ## Advanced
 
 ### Why arguments are separated as objects?
