@@ -56,6 +56,7 @@ class RequestCheck {
 
   rules: any
   requiredMessage: string
+  i18nRequiredMessage?: II18nMessage
   useFieldNameAsKey: boolean
 
   constructor() {
@@ -68,8 +69,9 @@ class RequestCheck {
     this.rules = {}
   }
 
-  setRequiredMessage = (message: string) => {
+  setRequiredMessage = (message: string, i18n?: II18nMessage) => {
     this.requiredMessage = message
+    if(i18n) this.i18nRequiredMessage = i18n
   }
 
   addRule = (field: string, ...rules: IRule[]) => {
@@ -145,7 +147,7 @@ class RequestCheck {
       }
 
       if (isMissing) {
-        const invalidField = this.buildInvalidField({ value, field: label, message: this.requiredMessage, })
+        const invalidField = this.buildInvalidField({ value, field: label, message: this.requiredMessage, i18n: this.i18nRequiredMessage })
         invalid.push(invalidField)
         continue
       }
