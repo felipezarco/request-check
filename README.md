@@ -447,6 +447,76 @@ router.get('/hello', (req: Request, res: Response) => {
 Responser is a middleware that helps you send responses with a standard format in your Express app.
 Check it out at: https://www.npmjs.com/package/responser
 
+## Changelog
+
+All notable changes to this project are documented below, following [Semantic Versioning](https://semver.org/).
+
+### v1.6.1 (Latest)
+- **feat**: Add `i18nRequiredMessage` property for i18n support on required field messages
+- **docs**: Improved documentation for i18n configuration
+
+### v1.6.0
+- **feat**: Add full i18n support for validation messages
+- **feat**: Add `i18n` object property to rules with `key` and `options`
+- **feat**: Combine `useFieldNameAsKey` with i18n for structured error output
+- **feat**: Add `setRequiredMessage()` method with i18n support
+- **impr**: Centralize i18n messages and enhance test clarity
+
+### v1.5.1
+- **fix**: Fix array attribution override with shallow copy
+- **fix**: Rules object reference issue resolved (clone rules instead of reference)
+
+### v1.5.0
+- **feat**: Add `addRules` method to add multiple rules as array
+- **feat**: Add `overwriteRule` and `overwriteRules` methods
+- **feat**: Add `clearRules()` method to clear previously added rules
+
+### v1.4.0
+- **feat**: Add `isRequiredField` option for optional validation
+- **impr**: Renamed from `isOptionalField` to `isRequiredField` for clarity
+
+### v1.3.2
+- **feat**: Add `useFieldNameAsKey` option for alternative error format
+
+### v1.3.1
+- **fix**: Bug fixes for `useFieldNameAsKey` implementation
+
+### v1.2.9
+- **feat**: Initial implementation of `useFieldNameAsKey`
+
+### v1.2.8
+- **feat**: Add `IFieldsAndRules` TypeScript interface
+
+### v1.2.7
+- **impr**: Explicit rule interface for `| undefined` types
+
+### v1.2.6
+- **fix**: Minor bug fixes and improvements
+
+### v1.2.5
+- **docs**: README updates and documentation improvements
+
+### v1.2.4
+- **feat**: Add optional validation support
+
+### v1.2.3
+- **docs**: Documentation updates
+
+### v1.2.2
+- **fix**: Minor fixes
+
+### v1.2.1
+- **feat**: Add multiple fields and rules at once functionality
+- **feat**: Add multiple rules feature
+
+### v0.2.10
+- **feat**: Add validation for non-existing objects
+
+### v0.2.9
+- **fix**: Remove unused functions and initial cleanup
+
+---
+
 ## Testing
 
 Run the test suit with `yarn test`.
