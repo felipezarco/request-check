@@ -29,10 +29,11 @@ interface II18nMessage {
 declare class RequestCheck {
     rules: any;
     requiredMessage: string;
+    i18nRequiredMessage?: II18nMessage;
     useFieldNameAsKey: boolean;
     constructor();
     clearRules: () => void;
-    setRequiredMessage: (message: string) => void;
+    setRequiredMessage: (message: string, i18n?: II18nMessage | undefined) => void;
     addRule: (field: string, ...rules: IRule[]) => void;
     addRules: (field: string, rules: IRule[]) => void;
     overwriteRule: (field: string, ...rules: IRule[]) => void;

@@ -24,8 +24,10 @@ class RequestCheck {
         this.clearRules = () => {
             this.rules = {};
         };
-        this.setRequiredMessage = (message) => {
+        this.setRequiredMessage = (message, i18n) => {
             this.requiredMessage = message;
+            if (i18n)
+                this.i18nRequiredMessage = i18n;
         };
         this.addRule = (field, ...rules) => {
             this.addRules(field, rules);
@@ -93,7 +95,7 @@ class RequestCheck {
                     continue;
                 }
                 if (isMissing) {
-                    const invalidField = this.buildInvalidField({ value, field: label, message: this.requiredMessage, });
+                    const invalidField = this.buildInvalidField({ value, field: label, message: this.requiredMessage, i18n: this.i18nRequiredMessage });
                     invalid.push(invalidField);
                     continue;
                 }
