@@ -1,6 +1,6 @@
 {
   "name": "request-check",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Validate requests required fields and rules on express and other frameworks",
   "main": "index.js",
   "types": "index",

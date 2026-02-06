@@ -451,9 +451,12 @@ Check it out at: https://www.npmjs.com/package/responser
 
 All notable changes to this project are documented below, following [Semantic Versioning](https://semver.org/).
 
-### v1.6.1 (Latest)
+### v1.6.2 (Latest)
 - **feat**: Add `i18nRequiredMessage` property for i18n support on required field messages
 - **docs**: Improved documentation for i18n configuration
+
+### v1.6.1
+- **chore**: Version bump and maintenance updates
 
 ### v1.6.0
 - **feat**: Add full i18n support for validation messages
